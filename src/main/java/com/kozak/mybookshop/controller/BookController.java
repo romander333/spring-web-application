@@ -3,10 +3,14 @@ package com.kozak.mybookshop.controller;
 import com.kozak.mybookshop.dto.BookDto;
 import com.kozak.mybookshop.dto.CreateBookRequestDto;
 import com.kozak.mybookshop.service.BookService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController

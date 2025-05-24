@@ -1,10 +1,10 @@
-package com.romander333.webapplication;
+package com.kozak.mybookshop;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class WebApplicationTests {
+class MateApplicationTests {
 
     @Test
     void contextLoads() {
