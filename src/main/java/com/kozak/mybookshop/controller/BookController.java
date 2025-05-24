@@ -5,16 +5,18 @@ import com.kozak.mybookshop.dto.CreateBookRequestDto;
 import com.kozak.mybookshop.service.BookService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/books")
+@RequestMapping("/books")
 public class BookController {
 
     private final BookService bookService;
@@ -25,8 +27,19 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public BookDto getBookById(@PathVariable int id) {
+    public BookDto getBookById(@PathVariable Long id) {
         return bookService.getById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteBookById(@PathVariable Long id) {
+        bookService.deleteById(id);
+    }
+
+    @PutMapping("/{id}")
+    public BookDto updateBookById(@PathVariable Long id,
+                                  @RequestBody CreateBookRequestDto request) {
+        return bookService.update(request, id);
     }
 
     @PostMapping

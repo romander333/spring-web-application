@@ -7,9 +7,9 @@ import com.kozak.mybookshop.mapper.BookMapper;
 import com.kozak.mybookshop.model.Book;
 import com.kozak.mybookshop.repository.BookRepository;
 import java.util.List;
-import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +22,6 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDto save(CreateBookRequestDto requestDto) {
         Book book = bookMapper.toModel(requestDto);
-        book.setIsbn("UA" + new Random().nextInt(100000));
         return bookMapper.toBookDto(bookRepository.save(book));
     }
 
@@ -35,9 +34,34 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookDto getById(int id) {
+    public BookDto getById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Book not found by id:" + id));
         return bookMapper.toBookDto(book);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        bookRepository.deleteById(id);
+    }
+
+    @Transactional
+    @Override
+    public BookDto update(CreateBookRequestDto requestDto, Long id) {
+        if (!bookRepository.existsById(id)) {
+            throw new EntityNotFoundException("Book not found by id:" + id);
+        }
+
+        Book book = bookMapper.toModel(requestDto);
+        book.setId(id);
+        bookRepository.updateBookById(id,book.getTitle(),
+                book.getAuthor(),
+                book.getIsbn(),
+                book.getPrice(),
+                book.getDescription(),
+                book.getCoverImage());
+
+        return bookMapper.toBookDto(book);
+
     }
 }
