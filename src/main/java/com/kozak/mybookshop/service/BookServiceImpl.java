@@ -62,6 +62,5 @@ public class BookServiceImpl implements BookService {
                 book.getCoverImage());
 
         return bookMapper.toBookDto(book);
-
     }
 }
