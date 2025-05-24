@@ -23,5 +23,4 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                         @Param("price") BigDecimal price,
                         @Param("description") String description,
                         @Param("coverImage") String coverImage);
-
 }
