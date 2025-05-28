@@ -1,6 +1,7 @@
 package com.kozak.mybookshop.controller;
 
 import com.kozak.mybookshop.dto.BookDto;
+import com.kozak.mybookshop.dto.BookSearchParametersDto;
 import com.kozak.mybookshop.dto.CreateBookRequestDto;
 import com.kozak.mybookshop.service.BookService;
 import java.util.List;
@@ -50,4 +51,8 @@ public class BookController {
         return bookService.save(bookDto);
     }
 
+    @GetMapping("/search")
+    public List<BookDto> search(BookSearchParametersDto parameters) {
+        return bookService.search(parameters);
+    }
 }
