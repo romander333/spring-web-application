@@ -6,11 +6,9 @@ import com.kozak.mybookshop.dto.CreateBookRequestDto;
 import com.kozak.mybookshop.exception.EntityNotFoundException;
 import com.kozak.mybookshop.mapper.BookMapper;
 import com.kozak.mybookshop.model.Book;
-import com.kozak.mybookshop.repository.SpecificationBuilder;
 import com.kozak.mybookshop.repository.book.BookRepository;
-import java.util.List;
-
 import com.kozak.mybookshop.repository.book.BookSpecificationBuilder;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
