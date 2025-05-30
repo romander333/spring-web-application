@@ -29,7 +29,7 @@ public class Book {
     @Column(nullable = false)
     private String author;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String isbn;
 
     @Column(nullable = false)
@@ -38,7 +38,6 @@ public class Book {
     @Column(length = 1000)
     private String description;
 
-    @Column(name = "cover_image")
     private String coverImage;
 
     @Column(nullable = false)
