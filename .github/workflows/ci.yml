@@ -30,9 +30,4 @@ jobs:
           distribution: 'adopt'
           cache: maven
       - name: Build with Maven
-        env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/book_store
-          SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: 08122005rR
         run: mvn --batch-mode --update-snapshots verify
-
