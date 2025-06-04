@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import lombok.Data;
 
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateBookRequestDto {
     @NotBlank
     private String title;
