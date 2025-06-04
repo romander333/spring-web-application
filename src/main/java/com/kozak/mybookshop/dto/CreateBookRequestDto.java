@@ -1,6 +1,5 @@
 package com.kozak.mybookshop.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kozak.mybookshop.validation.CoverImage;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
