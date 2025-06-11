@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final HttpStatus BAD_REQUEST_STATUS = HttpStatus.BAD_REQUEST;
+    private static final HttpStatus CONFLICT_STATUS = HttpStatus.CONFLICT;
     private static final String TIMESTAMP_KEY = "timestamp";
     private static final String STATUS_KEY = "status";
     private static final String ERRORS_KEY = "errors";
@@ -56,6 +57,6 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(RegistrationException.class)
     public ResponseEntity<Object> handleRegistrationException(RegistrationException ex) {
-        return new ResponseEntity<>(ex.getMessage(), BAD_REQUEST_STATUS);
+        return new ResponseEntity<>(ex.getMessage(), CONFLICT_STATUS);
     }
 }

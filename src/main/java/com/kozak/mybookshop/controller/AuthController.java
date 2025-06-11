@@ -3,6 +3,7 @@ package com.kozak.mybookshop.controller;
 import com.kozak.mybookshop.dto.user.UserRegistrationRequestDto;
 import com.kozak.mybookshop.dto.user.UserResponseDto;
 import com.kozak.mybookshop.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +17,7 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/registration")
-    public UserResponseDto register(@RequestBody UserRegistrationRequestDto requestDto) {
+    public UserResponseDto register(@RequestBody @Valid UserRegistrationRequestDto requestDto) {
         return userService.registration(requestDto);
     }
 }
