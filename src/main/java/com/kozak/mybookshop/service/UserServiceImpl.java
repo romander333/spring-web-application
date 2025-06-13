@@ -6,7 +6,6 @@ import com.kozak.mybookshop.exception.RegistrationException;
 import com.kozak.mybookshop.mapper.UserMapper;
 import com.kozak.mybookshop.model.User;
 import com.kozak.mybookshop.repository.user.UserRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +17,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto registration(UserRegistrationRequestDto userRegistrationRequestDto) {
-        Optional<User> existingUser = userRepository.findByEmail(
-                userRegistrationRequestDto.getEmail());
-        if (existingUser.isPresent()) {
-            throw new RegistrationException("Email already registered");
+        if (userRepository.existsByEmail(userRegistrationRequestDto.getEmail())) {
+            throw new RegistrationException("This email: "
+                    + userRegistrationRequestDto.getEmail()
+                    + " is already registered");
         }
         User user = userMapper.toModel(userRegistrationRequestDto);
         userRepository.save(user);
