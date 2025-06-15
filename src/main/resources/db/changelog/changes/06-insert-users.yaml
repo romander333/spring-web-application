@@ -1,0 +1,53 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-users
+      author: roman
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: email
+                  value: romander@gmail.com
+              - column:
+                  name: password
+                  value: '$2a$12$k5M6AyJ4itLQTb6KgNZsCeTROTmcRGE0AUr9Z0Kk/Mr9aDM8LPkYq' 
+              - column:
+                  name: first_name
+                  value: John
+              - column:
+                  name: last_name
+                  value: Doe
+              - column:
+                  name: shipping_address
+                  value: Some address
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: email
+                  value: admin@gmail.com
+              - column:
+                  name: password
+                  value: '$2a$12$C2OnjlEg.PgOom6mbfdScuJY/8e3L7EhC0m7Y4WWnZPSqZeTa6wXm' 
+              - column:
+                  name: first_name
+                  value: Admin
+              - column:
+                  name: last_name
+                  value: User
+              - column:
+                  name: shipping_address
+                  value: Admin address
+              - column:
+                  name: is_deleted
+                  valueBoolean: false

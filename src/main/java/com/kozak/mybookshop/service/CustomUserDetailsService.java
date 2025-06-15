@@ -1,5 +1,6 @@
 package com.kozak.mybookshop.service;
 
+import com.kozak.mybookshop.model.User;
 import com.kozak.mybookshop.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,8 +15,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Cannot find user by email: " + username));
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        System.out.println("Loaded password for user " + username + ": " + user.getPassword());
+        return user;
 
     }
 }
