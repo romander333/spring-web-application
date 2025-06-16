@@ -26,5 +26,4 @@ public class UserRegistrationRequestDto {
     @NotBlank
     private String lastName;
     private String shippingAddress;
-    private Set<Role.RoleName> roles = new HashSet<>();
 }

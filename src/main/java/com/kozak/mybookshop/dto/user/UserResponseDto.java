@@ -8,6 +8,5 @@ public record UserResponseDto(
         String email,
         String firstName,
         String lastName,
-        String shippingAddress,
-        Set<Role> roles) {
+        String shippingAddress) {
 }

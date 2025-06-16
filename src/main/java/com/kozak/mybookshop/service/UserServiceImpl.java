@@ -2,17 +2,17 @@ package com.kozak.mybookshop.service;
 
 import com.kozak.mybookshop.dto.user.UserRegistrationRequestDto;
 import com.kozak.mybookshop.dto.user.UserResponseDto;
+import com.kozak.mybookshop.exception.EntityNotFoundException;
 import com.kozak.mybookshop.exception.RegistrationException;
 import com.kozak.mybookshop.mapper.UserMapper;
 import com.kozak.mybookshop.model.Role;
 import com.kozak.mybookshop.model.User;
 import com.kozak.mybookshop.repository.role.RoleRepository;
 import com.kozak.mybookshop.repository.user.UserRepository;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -31,12 +31,9 @@ public class UserServiceImpl implements UserService {
         }
         User user = userMapper.toModel(userRegistrationRequestDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Set<Role> roles = userRegistrationRequestDto.getRoles().stream()
-                .map(roleName -> roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new RuntimeException("Role not found: " + roleName)))
-                .collect(Collectors.toSet());
-
-        user.setRoles(roles);
+        Role role = roleRepository.findByName(Role.RoleName.USER)
+                .orElseThrow(() -> new EntityNotFoundException("Role USER not found"));
+        user.setRoles(Set.of(role));
         userRepository.save(user);
         return userMapper.toUserResponseDto(user);
     }
