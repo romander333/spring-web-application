@@ -1,4 +1,4 @@
-package com.kozak.mybookshop.mapperconfig;
+package com.kozak.mybookshop.config;
 
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.NullValueCheckStrategy;
