@@ -9,10 +9,10 @@ import com.kozak.mybookshop.model.Role;
 import com.kozak.mybookshop.model.User;
 import com.kozak.mybookshop.repository.role.RoleRepository;
 import com.kozak.mybookshop.repository.user.UserRepository;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
