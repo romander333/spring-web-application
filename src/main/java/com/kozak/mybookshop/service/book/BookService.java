@@ -1,8 +1,8 @@
-package com.kozak.mybookshop.service;
+package com.kozak.mybookshop.service.book;
 
-import com.kozak.mybookshop.dto.BookDto;
-import com.kozak.mybookshop.dto.BookSearchParametersDto;
-import com.kozak.mybookshop.dto.CreateBookRequestDto;
+import com.kozak.mybookshop.dto.book.BookDto;
+import com.kozak.mybookshop.dto.book.BookSearchParametersDto;
+import com.kozak.mybookshop.dto.book.CreateBookRequestDto;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,4 +19,6 @@ public interface BookService {
     BookDto update(CreateBookRequestDto requestDto, Long id);
 
     List<BookDto> search(BookSearchParametersDto requestDto);
+
+    List<BookDto> getBooksByCategoryId(Long categoryId);
 }

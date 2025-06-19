@@ -1,9 +1,9 @@
 package com.kozak.mybookshop.controller;
 
-import com.kozak.mybookshop.dto.BookDto;
-import com.kozak.mybookshop.dto.BookSearchParametersDto;
-import com.kozak.mybookshop.dto.CreateBookRequestDto;
-import com.kozak.mybookshop.service.BookService;
+import com.kozak.mybookshop.dto.book.BookDto;
+import com.kozak.mybookshop.dto.book.BookSearchParametersDto;
+import com.kozak.mybookshop.dto.book.CreateBookRequestDto;
+import com.kozak.mybookshop.service.book.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
