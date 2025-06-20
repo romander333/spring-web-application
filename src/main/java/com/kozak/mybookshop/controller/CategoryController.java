@@ -1,7 +1,7 @@
 package com.kozak.mybookshop.controller;
 
-import com.kozak.mybookshop.dto.book.BookDto;
-import com.kozak.mybookshop.dto.category.CategoryDto;
+import com.kozak.mybookshop.dto.book.BookDtoWithoutCategoryIds;
+import com.kozak.mybookshop.dto.category.CategoryRequestDto;
 import com.kozak.mybookshop.service.book.BookService;
 import com.kozak.mybookshop.service.category.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,28 +31,30 @@ public class CategoryController {
     @PostMapping
     @Operation(summary = "Create category", description = "Create categories")
     @PreAuthorize("hasRole('ADMIN')")
-    public CategoryDto createCategory(@RequestBody CategoryDto categoryDto) {
+    public CategoryRequestDto createCategory(@RequestBody CategoryRequestDto categoryDto) {
         return categoryService.save(categoryDto);
     }
 
     @GetMapping
     @Operation(summary = "Get sum categories", description = "Get a page of categories")
     @PreAuthorize("hasRole('USER')")
-    public Page<CategoryDto> getAll(Pageable pageable) {
+    public Page<CategoryRequestDto> getAll(Pageable pageable) {
         return categoryService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get by id", description = "Get Category by id")
     @PreAuthorize("hasRole('USER')")
-    public CategoryDto getCategoryById(@PathVariable Long id) {
+    public CategoryRequestDto getCategoryById(@PathVariable Long id) {
         return categoryService.getById(id);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update by id", description = "Update category by id")
     @PreAuthorize("hasRole('ADMIN')")
-    public CategoryDto updateCategory(@PathVariable Long id, @RequestBody CategoryDto categoryDto) {
+    public CategoryRequestDto updateCategory(
+            @PathVariable Long id,
+            @RequestBody CategoryRequestDto categoryDto) {
         return categoryService.update(id, categoryDto);
     }
 
@@ -66,7 +68,7 @@ public class CategoryController {
     @GetMapping("/{id}/books")
     @Operation(summary = "Get books by category", description = "Get books by certain category")
     @PreAuthorize("hasRole('USER')")
-    public List<BookDto> getBooksByCategory(@PathVariable Long id) {
+    public List<BookDtoWithoutCategoryIds> getBooksByCategory(@PathVariable Long id) {
         return bookService.getBooksByCategoryId(id);
     }
 }

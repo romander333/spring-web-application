@@ -3,6 +3,7 @@ package com.kozak.mybookshop.dto.book;
 import com.kozak.mybookshop.validation.CoverImage;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,5 +24,6 @@ public class CreateBookRequestDto {
     private String description;
     @CoverImage
     private String coverImage;
+    @NotEmpty
     private List<Long> categoryIds;
 }
