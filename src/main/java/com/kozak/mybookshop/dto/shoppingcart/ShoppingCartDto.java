@@ -1,9 +1,8 @@
 package com.kozak.mybookshop.dto.shoppingcart;
 
-import com.kozak.mybookshop.dto.cartItem.CartItemDto;
-import lombok.Data;
-
+import com.kozak.mybookshop.dto.cartitem.CartItemDto;
 import java.util.Set;
+import lombok.Data;
 
 @Data
 public class ShoppingCartDto {

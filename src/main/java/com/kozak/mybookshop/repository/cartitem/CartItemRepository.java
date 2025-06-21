@@ -9,5 +9,5 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     @Query("update CartItem c set c.quantity = :quantity where c.id = :id")
     @Modifying
-    CartItem updateQuantityById(int quantity, Long id);
+    void updateQuantityById(int quantity, Long id);
 }

@@ -1,4 +1,4 @@
-package com.kozak.mybookshop.dto.cartItem;
+package com.kozak.mybookshop.dto.cartitem;
 
 import lombok.Data;
 

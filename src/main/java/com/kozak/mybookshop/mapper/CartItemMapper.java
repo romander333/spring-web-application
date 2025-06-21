@@ -1,8 +1,8 @@
 package com.kozak.mybookshop.mapper;
 
 import com.kozak.mybookshop.config.MapperConfig;
-import com.kozak.mybookshop.dto.cartItem.CartItemDto;
-import com.kozak.mybookshop.dto.cartItem.CreateCartItemRequestDto;
+import com.kozak.mybookshop.dto.cartitem.CartItemDto;
+import com.kozak.mybookshop.dto.cartitem.CreateCartItemRequestDto;
 import com.kozak.mybookshop.model.CartItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
