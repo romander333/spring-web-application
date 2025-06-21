@@ -1,8 +1,9 @@
-package com.kozak.mybookshop.service;
+package com.kozak.mybookshop.service.book;
 
-import com.kozak.mybookshop.dto.BookDto;
-import com.kozak.mybookshop.dto.BookSearchParametersDto;
-import com.kozak.mybookshop.dto.CreateBookRequestDto;
+import com.kozak.mybookshop.dto.book.BookDto;
+import com.kozak.mybookshop.dto.book.BookDtoWithoutCategoryIds;
+import com.kozak.mybookshop.dto.book.BookSearchParametersDto;
+import com.kozak.mybookshop.dto.book.CreateBookRequestDto;
 import com.kozak.mybookshop.exception.EntityNotFoundException;
 import com.kozak.mybookshop.mapper.BookMapper;
 import com.kozak.mybookshop.model.Book;
@@ -33,9 +34,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Page<BookDto> findAll(Pageable pageable) {
+    public Page<BookDtoWithoutCategoryIds> findAll(Pageable pageable) {
         return bookRepository.findAll(pageable)
-                .map(bookMapper::toBookDto);
+                .map(bookMapper::toDtoWithoutCategories);
     }
 
     @Override
@@ -65,6 +66,13 @@ public class BookServiceImpl implements BookService {
         Specification<Book> specification = bookSpecificationBuilder.build(requestDto);
         return bookRepository.findAll(specification).stream()
                 .map(bookMapper::toBookDto)
+                .toList();
+    }
+
+    @Override
+    public List<BookDtoWithoutCategoryIds> getBooksByCategoryId(Long categoryId) {
+        return bookRepository.findByCategories_Id(categoryId).stream()
+                .map(bookMapper::toDtoWithoutCategories)
                 .toList();
     }
 }

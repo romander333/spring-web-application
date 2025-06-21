@@ -1,4 +1,4 @@
-package com.kozak.mybookshop.service;
+package com.kozak.mybookshop.service.user;
 
 import com.kozak.mybookshop.dto.user.UserRegistrationRequestDto;
 import com.kozak.mybookshop.dto.user.UserResponseDto;

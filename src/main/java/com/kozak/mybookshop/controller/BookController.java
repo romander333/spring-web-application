@@ -1,9 +1,10 @@
 package com.kozak.mybookshop.controller;
 
-import com.kozak.mybookshop.dto.BookDto;
-import com.kozak.mybookshop.dto.BookSearchParametersDto;
-import com.kozak.mybookshop.dto.CreateBookRequestDto;
-import com.kozak.mybookshop.service.BookService;
+import com.kozak.mybookshop.dto.book.BookDto;
+import com.kozak.mybookshop.dto.book.BookDtoWithoutCategoryIds;
+import com.kozak.mybookshop.dto.book.BookSearchParametersDto;
+import com.kozak.mybookshop.dto.book.CreateBookRequestDto;
+import com.kozak.mybookshop.service.book.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -33,7 +34,7 @@ public class BookController {
     @GetMapping
     @Operation(summary = "Get some books", description = "get a page of books")
     @PreAuthorize("hasRole('USER')")
-    public Page<BookDto> getAll(Pageable pageable) {
+    public Page<BookDtoWithoutCategoryIds> getAll(Pageable pageable) {
         return bookService.findAll(pageable);
     }
 

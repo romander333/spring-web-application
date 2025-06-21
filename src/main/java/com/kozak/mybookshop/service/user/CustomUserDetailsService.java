@@ -1,4 +1,4 @@
-package com.kozak.mybookshop.service;
+package com.kozak.mybookshop.service.user;
 
 import com.kozak.mybookshop.model.User;
 import com.kozak.mybookshop.repository.user.UserRepository;

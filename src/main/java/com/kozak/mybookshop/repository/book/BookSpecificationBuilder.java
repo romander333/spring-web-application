@@ -1,6 +1,6 @@
 package com.kozak.mybookshop.repository.book;
 
-import com.kozak.mybookshop.dto.BookSearchParametersDto;
+import com.kozak.mybookshop.dto.book.BookSearchParametersDto;
 import com.kozak.mybookshop.model.Book;
 import com.kozak.mybookshop.repository.SpecificationBuilder;
 import com.kozak.mybookshop.repository.SpecificationProviderManager;

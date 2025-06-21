@@ -5,7 +5,7 @@ import com.kozak.mybookshop.dto.user.UserLoginResponseDto;
 import com.kozak.mybookshop.dto.user.UserRegistrationRequestDto;
 import com.kozak.mybookshop.dto.user.UserResponseDto;
 import com.kozak.mybookshop.security.AuthenticationService;
-import com.kozak.mybookshop.service.UserService;
+import com.kozak.mybookshop.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
