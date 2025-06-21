@@ -29,7 +29,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public ShoppingCartDto addCartItem(CreateCartItemRequestDto requestDto) {
         User user = authenticationService.getCurrentUser();
 
-        ShoppingCart shoppingCart = shoppingCartRepository.findByUser(user);
+        ShoppingCart shoppingCart = shoppingCartRepository.findShoppingCartByUser(user);
 
         Book book = bookRepository.findById(requestDto.getBookId())
                 .orElseThrow(() -> new RuntimeException("Book not found"));
@@ -57,7 +57,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public ShoppingCartDto getShoppingCart() {
         User currentUser = authenticationService.getCurrentUser();
-        ShoppingCart shoppingCart = shoppingCartRepository.findByUser(currentUser);
+        ShoppingCart shoppingCart = shoppingCartRepository.findShoppingCartByUser(currentUser);
         return shoppingCartMapper.toDto(shoppingCart);
     }
 

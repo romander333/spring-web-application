@@ -1,7 +1,13 @@
 package com.kozak.mybookshop.dto.shoppingcart;
 
 import com.kozak.mybookshop.dto.cartItem.CartItemDto;
+import lombok.Data;
+
 import java.util.Set;
 
-public record ShoppingCartDto(Long id, Long userId, Set<CartItemDto> cartItems) {
+@Data
+public class ShoppingCartDto {
+    private Long id;
+    private Long userId;
+    private Set<CartItemDto> cartItemSet;
 }
