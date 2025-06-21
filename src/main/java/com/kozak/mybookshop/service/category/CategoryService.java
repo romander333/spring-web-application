@@ -1,17 +1,18 @@
 package com.kozak.mybookshop.service.category;
 
 import com.kozak.mybookshop.dto.category.CategoryRequestDto;
+import com.kozak.mybookshop.dto.category.CategoryResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface CategoryService {
-    Page<CategoryRequestDto> findAll(Pageable pageable);
+    Page<CategoryResponseDto> findAll(Pageable pageable);
 
-    CategoryRequestDto getById(Long id);
+    CategoryResponseDto getById(Long id);
 
-    CategoryRequestDto save(CategoryRequestDto categoryDto);
+    CategoryResponseDto save(CategoryRequestDto categoryDto);
 
-    CategoryRequestDto update(Long id, CategoryRequestDto categoryDto);
+    CategoryResponseDto update(Long id, CategoryRequestDto categoryDto);
 
     void deleteById(Long id);
 }

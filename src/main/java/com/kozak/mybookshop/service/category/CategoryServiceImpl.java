@@ -1,6 +1,7 @@
 package com.kozak.mybookshop.service.category;
 
 import com.kozak.mybookshop.dto.category.CategoryRequestDto;
+import com.kozak.mybookshop.dto.category.CategoryResponseDto;
 import com.kozak.mybookshop.exception.EntityNotFoundException;
 import com.kozak.mybookshop.mapper.CategoryMapper;
 import com.kozak.mybookshop.model.Category;
@@ -17,26 +18,26 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
 
     @Override
-    public Page<CategoryRequestDto> findAll(Pageable pageable) {
+    public Page<CategoryResponseDto> findAll(Pageable pageable) {
         return categoryRepository.findAll(pageable)
                 .map(categoryMapper::toDto);
     }
 
     @Override
-    public CategoryRequestDto getById(Long id) {
+    public CategoryResponseDto getById(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Cannot find Category with id: " + id));
         return categoryMapper.toDto(category);
     }
 
     @Override
-    public CategoryRequestDto save(CategoryRequestDto categoryDto) {
+    public CategoryResponseDto save(CategoryRequestDto categoryDto) {
         return categoryMapper
                 .toDto(categoryRepository.save(categoryMapper.toEntity(categoryDto)));
     }
 
     @Override
-    public CategoryRequestDto update(Long id, CategoryRequestDto categoryDto) {
+    public CategoryResponseDto update(Long id, CategoryRequestDto categoryDto) {
         Category category = categoryRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Cannot find Category with id: " + id));
         categoryMapper.updateCategory(category, categoryDto);
