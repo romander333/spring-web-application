@@ -3,7 +3,6 @@ package com.kozak.mybookshop.controller;
 import com.kozak.mybookshop.dto.cartitem.CartItemQuantityRequestDto;
 import com.kozak.mybookshop.dto.cartitem.CreateCartItemRequestDto;
 import com.kozak.mybookshop.dto.shoppingcart.ShoppingCartDto;
-import com.kozak.mybookshop.service.cartitem.CartItemService;
 import com.kozak.mybookshop.service.shoppingcart.ShoppingCartService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/cart")
 public class CartItemController {
     private final ShoppingCartService shoppingCartService;
-    private final CartItemService cartItemService;
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")
@@ -55,6 +53,6 @@ public class CartItemController {
     @PreAuthorize("hasRole('USER')")
     @Operation(summary = "Delete item", description = "Delete item from cart by id")
     public void deleteCartItem(@PathVariable Long id) {
-        cartItemService.delete(id);
+        shoppingCartService.deleteCartItem(id);
     }
 }
