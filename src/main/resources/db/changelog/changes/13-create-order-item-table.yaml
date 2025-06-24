@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: create-cart-item
       author: roman
+      id: create-order-item
       changes:
         - createTable:
-            tableName: cart_items
+            tableName: order_items
             columns:
               - column:
                   name: id
@@ -14,7 +14,7 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: cart_id
+                  name: order_id
                   type: bigint
                   constraints:
                     nullable: false
@@ -29,24 +29,24 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: is_deleted
-                  type: BOOLEAN
-                  defaultValueBoolean: false
+                  name: price
+                  type: decimal
                   constraints:
                     nullable: false
 
               - addForeignKeyConstraint:
-                  baseTableName: cart_items
-                  baseColumnNames: cart_id
-                  constraintName: fk_cart_items_cart
-                  referencedTableName: shopping_сarts
-                  referencedColumnNames: id
+                  baseTableName: order_items
+                  baseColumnName: order_id
+                  constraintName: fk_order_item_order
+                  referencedTableName: orders
+                  referencedColumnName: id
                   onDelete: CASCADE
-                    
+
               - addForeignKeyConstraint:
-                  baseTableName: cart_items
-                  baseColumnNames: book_id
-                  constraintName: fk_cart_items_book
+                  baseTableName: order_items
+                  baseColumnName: book_id
+                  constraintName: fk_book_order
                   referencedTableName: books
-                  referencedColumnNames: id
+                  referencedColumnName: id
                   onDelete: CASCADE
+

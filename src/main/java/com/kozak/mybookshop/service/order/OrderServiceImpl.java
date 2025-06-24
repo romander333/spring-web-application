@@ -2,48 +2,58 @@ package com.kozak.mybookshop.service.order;
 
 import com.kozak.mybookshop.dto.order.OrderDto;
 import com.kozak.mybookshop.dto.order.OrderRequestDto;
+import com.kozak.mybookshop.dto.order.OrderStatusRequestDto;
 import com.kozak.mybookshop.dto.orderitem.OrderItemDto;
+import com.kozak.mybookshop.exception.EntityNotFoundException;
+import com.kozak.mybookshop.mapper.OrderItemMapper;
 import com.kozak.mybookshop.mapper.OrderMapper;
-import com.kozak.mybookshop.model.*;
-import com.kozak.mybookshop.repository.cartitem.CartItemRepository;
+import com.kozak.mybookshop.model.CartItem;
+import com.kozak.mybookshop.model.Order;
+import com.kozak.mybookshop.model.OrderItem;
+import com.kozak.mybookshop.model.ShoppingCart;
+import com.kozak.mybookshop.model.User;
 import com.kozak.mybookshop.repository.order.OrderRepository;
-import com.kozak.mybookshop.repository.orderitem.OrderItemRepository;
 import com.kozak.mybookshop.repository.shoppingcart.ShoppingCartRepository;
 import com.kozak.mybookshop.security.AuthenticationService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
+import com.kozak.mybookshop.service.shoppingcart.ShoppingCartService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final AuthenticationService authenticationService;
     private final ShoppingCartRepository shoppingCartRepository;
     private final OrderMapper orderMapper;
-    private final CartItemRepository cartItemRepository;
+    private final ShoppingCartService shoppingCartService;
+    private final OrderItemMapper orderItemMapper;
 
     @Override
     public OrderDto createOrder(OrderRequestDto requestDto) {
-        User user = authenticationService.getCurrentUser();
+        User currentUser = authenticationService.getCurrentUser();
 
-        ShoppingCart shoppingCart = shoppingCartRepository.findShoppingCartByUser(user);
+        ShoppingCart shoppingCart = shoppingCartRepository.findShoppingCartByUser(currentUser)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "ShoppingCart not found by user id: "
+                        + currentUser.getId()));
         Set<CartItem> cartItems = new HashSet<>(shoppingCart.getCartItems());
         if (cartItems.isEmpty()) {
-            throw new IllegalStateException("No cart items found by the userId" + user.getId());
+            throw new IllegalStateException("No cart items found by the userId"
+                    + currentUser.getId());
         }
-        BigDecimal total = cartItems.stream()
-                .map(item  -> BigDecimal.valueOf(item.getQuantity()).multiply(item .getBook().getPrice()))
+        BigDecimal total = cartItems.stream().map(item -> BigDecimal.valueOf(
+                        item.getQuantity()).multiply(item.getBook().getPrice()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         Order order = new Order();
-        order.setUser(user);
+        order.setUser(currentUser);
         order.setOrderDate(LocalDateTime.now());
         order.setStatus(Order.Status.PENDING);
         order.setShippingAddress(requestDto.getShippingAddress());
@@ -58,14 +68,47 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setOrder(order);
             orderItems.add(orderItem);
         });
-            order.setOrderItems(orderItems);
+        order.setOrderItems(orderItems);
         orderRepository.save(order);
-        cartItemRepository.deleteCartItemByShoppingCart_Id(shoppingCart.getId());
+        shoppingCartService.deleteAllCartItems();
         return orderMapper.toDto(order);
     }
 
     @Override
-    public OrderDto getAllOrders() {
-        return null;
+    public List<OrderDto> getAllOrders() {
+        User currentUser = authenticationService.getCurrentUser();
+        return orderRepository.findAllByUser(currentUser).stream()
+                .map(orderMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public OrderDto updateStatus(Long id, OrderStatusRequestDto requestDto) {
+        Order order = orderRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Order not found by id: " + id));
+        order.setStatus(Order.Status.valueOf(requestDto.getStatus()));
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
+    }
+
+    @Override
+    public List<OrderItemDto> getOrderItems(Long id) {
+        Order order = orderRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Order not found by id: " + id));
+        return order.getOrderItems().stream()
+                .map(orderItemMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public OrderItemDto getOrderItemById(Long orderId, Long itemId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() ->
+                new EntityNotFoundException("Order not found by id: " + orderId));
+        return order.getOrderItems().stream()
+                .filter(item -> item.getId().equals(itemId))
+                .findFirst()
+                .map(orderItemMapper::toDto)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Order item not found by id: " + itemId));
     }
 }

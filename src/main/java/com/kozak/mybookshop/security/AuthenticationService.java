@@ -32,11 +32,6 @@ public class AuthenticationService {
             throw new RuntimeException("User is not authenticated");
         }
 
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof User) {
-            return (User) principal;
-        } else {
-            throw new RuntimeException("Principal is not of expected type");
-        }
+        return (User) authentication.getPrincipal();
     }
 }
