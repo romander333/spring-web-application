@@ -26,6 +26,7 @@ public class CartItemController {
     private final ShoppingCartService shoppingCartService;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('USER')")
     @Operation(summary = "Add new item", description = "Add new item to the cart")
     public ShoppingCartDto addCartItem(@RequestBody @Valid CreateCartItemRequestDto requestDto) {
