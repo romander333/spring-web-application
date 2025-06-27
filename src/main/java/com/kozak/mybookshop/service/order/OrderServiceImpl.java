@@ -40,7 +40,8 @@ public class OrderServiceImpl implements OrderService {
     public OrderDto createOrder(OrderRequestDto requestDto) {
         User currentUser = authenticationService.getCurrentUser();
 
-        ShoppingCart shoppingCart = shoppingCartRepository.findShoppingCartByUser_Id(currentUser.getId())
+        ShoppingCart shoppingCart =
+                shoppingCartRepository.findShoppingCartByUser_Id(currentUser.getId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "ShoppingCart not found by user id: "
                         + currentUser.getId()));
@@ -77,7 +78,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderDto> getAllOrders() {
         User currentUser = authenticationService.getCurrentUser();
-        return orderRepository.findAllByUser(currentUser).stream()
+        return orderRepository.findAllByUser_id(currentUser.getId()).stream()
                 .map(orderMapper::toDto)
                 .toList();
     }
