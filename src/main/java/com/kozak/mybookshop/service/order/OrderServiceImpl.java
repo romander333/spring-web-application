@@ -40,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderDto createOrder(OrderRequestDto requestDto) {
         User currentUser = authenticationService.getCurrentUser();
 
-        ShoppingCart shoppingCart = shoppingCartRepository.findShoppingCartByUser(currentUser)
+        ShoppingCart shoppingCart = shoppingCartRepository.findShoppingCartByUser_Id(currentUser.getId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "ShoppingCart not found by user id: "
                         + currentUser.getId()));
