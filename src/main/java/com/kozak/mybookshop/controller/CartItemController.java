@@ -45,7 +45,7 @@ public class CartItemController {
     @Operation(summary = "Update certain item", description = "Update item in the cart by id")
     public ShoppingCartDto updateCartItemQuantity(
             @PathVariable Long id,
-            @RequestBody CartItemQuantityRequestDto requestDto) {
+            @Valid @RequestBody CartItemQuantityRequestDto requestDto) {
         return shoppingCartService.updateQuantityById(id,requestDto);
     }
 

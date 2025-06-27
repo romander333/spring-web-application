@@ -31,7 +31,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public ShoppingCartDto updateQuantityById(Long id, CartItemQuantityRequestDto requestDto) {
         User currentUser = authenticationService.getCurrentUser();
-        ShoppingCart shoppingCart = shoppingCartRepository.findShoppingCartByUser(currentUser)
+        ShoppingCart shoppingCart =
+                shoppingCartRepository.findShoppingCartByUser_Id(currentUser.getId())
                 .orElseThrow(() ->
                         new EntityNotFoundException("ShoppingCart not found by user id: "
                                 + currentUser.getId()));
@@ -56,7 +57,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public void deleteCartItem(Long id) {
         User currentUser = authenticationService.getCurrentUser();
-        ShoppingCart shoppingCart = shoppingCartRepository.findShoppingCartByUser(currentUser)
+        ShoppingCart shoppingCart =
+                shoppingCartRepository.findShoppingCartByUser_Id(currentUser.getId())
                 .orElseThrow(() ->
                         new EntityNotFoundException("ShoppingCart not found by user id: "
                                 + currentUser.getId()));
@@ -71,8 +73,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public ShoppingCartDto addCartItem(CreateCartItemRequestDto requestDto) {
         User currentUser = authenticationService.getCurrentUser();
-
-        ShoppingCart shoppingCart = shoppingCartRepository.findShoppingCartByUser(currentUser)
+        ShoppingCart shoppingCart =
+                shoppingCartRepository.findShoppingCartByUser_Id(currentUser.getId())
                 .orElseThrow(() ->
                         new EntityNotFoundException("ShoppingCart not found by user id: "
                                 + currentUser.getId()));
@@ -105,7 +107,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public ShoppingCartDto getShoppingCart() {
         User currentUser = authenticationService.getCurrentUser();
         Optional<ShoppingCart> shoppingCartByUser =
-                shoppingCartRepository.findShoppingCartByUser(currentUser);
+                shoppingCartRepository.findShoppingCartByUser_Id(currentUser.getId());
         return shoppingCartMapper.toDto(shoppingCartByUser
                 .orElseThrow(() ->
                         new EntityNotFoundException("ShoppingCart not found by user id: "
