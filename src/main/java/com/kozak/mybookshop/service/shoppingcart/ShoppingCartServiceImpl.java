@@ -79,7 +79,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                         new EntityNotFoundException("ShoppingCart not found by user id: "
                                 + currentUser.getId()));
 
-        shoppingCart.getCartItems().clear();
+        shoppingCart.clearCart();
     }
 
     @Override
