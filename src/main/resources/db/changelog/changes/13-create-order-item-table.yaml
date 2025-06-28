@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      author: roman
+      id: create-order-item
+      changes:
+        - createTable:
+            tableName: order_items
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: book_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quantity
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: price
+                  type: decimal
+                  constraints:
+                    nullable: false
+
+              - addForeignKeyConstraint:
+                  baseTableName: order_items
+                  baseColumnName: order_id
+                  constraintName: fk_order_item_order
+                  referencedTableName: orders
+                  referencedColumnName: id
+                  onDelete: CASCADE
+
+              - addForeignKeyConstraint:
+                  baseTableName: order_items
+                  baseColumnName: book_id
+                  constraintName: fk_book_order
+                  referencedTableName: books
+                  referencedColumnName: id
+                  onDelete: CASCADE
+
