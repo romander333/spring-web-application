@@ -3,6 +3,9 @@ package com.kozak.mybookshop.repository.book;
 import com.kozak.mybookshop.model.Book;
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.persistence.Entity;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
