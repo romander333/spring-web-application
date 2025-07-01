@@ -71,14 +71,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public void deleteAllCartItems() {
-        User currentUser = authenticationService.getCurrentUser();
-        ShoppingCart shoppingCart =
-                shoppingCartRepository.findShoppingCartByUser_Id(currentUser.getId())
-                .orElseThrow(() ->
-                        new EntityNotFoundException("ShoppingCart not found by user id: "
-                                + currentUser.getId()));
-
+    public void deleteAllCartItems(ShoppingCart shoppingCart) {
         shoppingCart.clearCart();
     }
 
