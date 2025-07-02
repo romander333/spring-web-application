@@ -1,12 +1,10 @@
 package com.kozak.mybookshop.repository.order;
 
 import com.kozak.mybookshop.model.Order;
-import com.kozak.mybookshop.model.User;
-import java.util.List;
-import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    @EntityGraph(attributePaths = {"orderItems", "orderItems.book"})
-    List<Order> findAllByUser(User user);
+    Page<Order> findAllByUser_Id(Long userId, Pageable pageable);
 }

@@ -5,6 +5,7 @@ import com.kozak.mybookshop.dto.order.OrderRequestDto;
 import com.kozak.mybookshop.dto.order.OrderStatusRequestDto;
 import com.kozak.mybookshop.dto.orderitem.OrderItemDto;
 import com.kozak.mybookshop.exception.EntityNotFoundException;
+import com.kozak.mybookshop.exception.OrderProcessingException;
 import com.kozak.mybookshop.mapper.OrderItemMapper;
 import com.kozak.mybookshop.mapper.OrderMapper;
 import com.kozak.mybookshop.model.CartItem;
@@ -22,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,49 +41,26 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto createOrder(OrderRequestDto requestDto) {
-        User currentUser = authenticationService.getCurrentUser();
+        User currentUser = getCurrentUser();
+        ShoppingCart shoppingCart = getCurrentShoppingCart(currentUser);
 
-        ShoppingCart shoppingCart =
-                shoppingCartRepository.findShoppingCartByUser_Id(currentUser.getId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "ShoppingCart not found by user id: "
-                        + currentUser.getId()));
-        Set<CartItem> cartItems = new HashSet<>(shoppingCart.getCartItems());
-        if (cartItems.isEmpty()) {
-            throw new IllegalStateException("No cart items found by the userId"
-                    + currentUser.getId());
-        }
-        BigDecimal total = cartItems.stream().map(item -> BigDecimal.valueOf(
-                        item.getQuantity()).multiply(item.getBook().getPrice()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        Order order = new Order();
-        order.setUser(currentUser);
-        order.setOrderDate(LocalDateTime.now());
-        order.setStatus(Order.Status.PENDING);
-        order.setShippingAddress(requestDto.getShippingAddress());
-        order.setTotal(total);
-        Set<OrderItem> orderItems = new HashSet<>();
+        Set<CartItem> cartItems = getCartItemsOrThrow(shoppingCart);
+        BigDecimal total = calculateTotal(cartItems);
 
-        cartItems.forEach(cartItem -> {
-            OrderItem orderItem = new OrderItem();
-            orderItem.setBook(cartItem.getBook());
-            orderItem.setPrice(cartItem.getBook().getPrice());
-            orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setOrder(order);
-            orderItems.add(orderItem);
-        });
+        Order order = createOrderEntity(requestDto, currentUser, total);
+
+        Set<OrderItem> orderItems = convertCartToOrderItems(cartItems, order);
         order.setOrderItems(orderItems);
         orderRepository.save(order);
-        shoppingCartService.deleteAllCartItems();
+        shoppingCartService.deleteAllCartItems(shoppingCart);
         return orderMapper.toDto(order);
     }
 
     @Override
-    public List<OrderDto> getAllOrders() {
+    public Page<OrderDto> getAllOrders(Pageable pageable) {
         User currentUser = authenticationService.getCurrentUser();
-        return orderRepository.findAllByUser(currentUser).stream()
-                .map(orderMapper::toDto)
-                .toList();
+        return orderRepository.findAllByUser_Id(currentUser.getId(),pageable)
+                .map(orderMapper::toDto);
     }
 
     @Override
@@ -111,5 +91,55 @@ public class OrderServiceImpl implements OrderService {
                 .map(orderItemMapper::toDto)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Order item not found by id: " + itemId));
+    }
+
+    private User getCurrentUser() {
+        return authenticationService.getCurrentUser();
+    }
+
+    private ShoppingCart getCurrentShoppingCart(User user) {
+        return shoppingCartRepository.findShoppingCartByUser_Id(user.getId())
+                        .orElseThrow(() -> new EntityNotFoundException(
+                                "ShoppingCart not found by user id: "
+                                        + user.getId()));
+    }
+
+    private Set<CartItem> getCartItemsOrThrow(ShoppingCart shoppingCart) {
+        Set<CartItem> cartItems = shoppingCart.getCartItems();
+        if (cartItems.isEmpty()) {
+            throw new OrderProcessingException("No cart items found by the userId"
+                    + shoppingCart.getUser().getId());
+        }
+        return cartItems;
+    }
+
+    private BigDecimal calculateTotal(Set<CartItem> cartItems) {
+        return cartItems.stream().map(item -> BigDecimal.valueOf(
+                        item.getQuantity()).multiply(item.getBook().getPrice()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private Order createOrderEntity(OrderRequestDto requestDto, User user, BigDecimal total) {
+        Order order = new Order();
+        order.setUser(user);
+        order.setOrderDate(LocalDateTime.now());
+        order.setStatus(Order.Status.PENDING);
+        order.setShippingAddress(requestDto.getShippingAddress());
+        order.setTotal(total);
+        return order;
+    }
+
+    private Set<OrderItem> convertCartToOrderItems(Set<CartItem> cartItems, Order order) {
+        Set<OrderItem> orderItems = new HashSet<>();
+
+        cartItems.forEach(cartItem -> {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setBook(cartItem.getBook());
+            orderItem.setPrice(cartItem.getBook().getPrice());
+            orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setOrder(order);
+            orderItems.add(orderItem);
+        });
+        return orderItems;
     }
 }

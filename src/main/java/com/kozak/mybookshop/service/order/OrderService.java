@@ -5,11 +5,13 @@ import com.kozak.mybookshop.dto.order.OrderRequestDto;
 import com.kozak.mybookshop.dto.order.OrderStatusRequestDto;
 import com.kozak.mybookshop.dto.orderitem.OrderItemDto;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface OrderService {
     OrderDto createOrder(OrderRequestDto requestDto);
 
-    List<OrderDto> getAllOrders();
+    Page<OrderDto> getAllOrders(Pageable pageable);
 
     OrderDto updateStatus(Long id, OrderStatusRequestDto requestDto);
 
