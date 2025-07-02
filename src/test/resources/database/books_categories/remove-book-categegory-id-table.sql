@@ -1,0 +1,1 @@
+delete from books_categories where id between 1 and 3
