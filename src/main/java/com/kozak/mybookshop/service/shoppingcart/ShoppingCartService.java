@@ -3,6 +3,7 @@ package com.kozak.mybookshop.service.shoppingcart;
 import com.kozak.mybookshop.dto.cartitem.CartItemQuantityRequestDto;
 import com.kozak.mybookshop.dto.cartitem.CreateCartItemRequestDto;
 import com.kozak.mybookshop.dto.shoppingcart.ShoppingCartDto;
+import com.kozak.mybookshop.model.ShoppingCart;
 import com.kozak.mybookshop.model.User;
 
 public interface ShoppingCartService {
@@ -15,4 +16,6 @@ public interface ShoppingCartService {
     ShoppingCartDto createShoppingCart(User user);
 
     void deleteCartItem(Long id);
+
+    void deleteAllCartItems(ShoppingCart shoppingCart);
 }

@@ -71,8 +71,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
+    public void deleteAllCartItems(ShoppingCart shoppingCart) {
+        shoppingCart.clearCart();
+    }
+
+    @Override
     public ShoppingCartDto addCartItem(CreateCartItemRequestDto requestDto) {
         User currentUser = authenticationService.getCurrentUser();
+
         ShoppingCart shoppingCart =
                 shoppingCartRepository.findShoppingCartByUser_Id(currentUser.getId())
                 .orElseThrow(() ->
