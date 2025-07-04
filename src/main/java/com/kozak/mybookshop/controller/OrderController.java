@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,8 +31,8 @@ public class OrderController {
     @GetMapping
     @Operation(summary = "Get orders", description = "Get order history")
     @PreAuthorize("hasRole('USER')")
-    public List<OrderDto> getOrders() {
-        return orderService.getAllOrders();
+    public Page<OrderDto> getOrders(Pageable pageable) {
+        return orderService.getAllOrders(pageable);
     }
 
     @GetMapping("/{id}/items")
