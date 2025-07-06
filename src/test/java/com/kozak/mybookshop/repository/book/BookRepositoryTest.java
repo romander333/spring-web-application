@@ -1,7 +1,7 @@
-package com.kozak.mybookshop.repository;
+package com.kozak.mybookshop.repository.book;
 
 import com.kozak.mybookshop.model.Book;
-import com.kozak.mybookshop.repository.book.BookRepository;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
