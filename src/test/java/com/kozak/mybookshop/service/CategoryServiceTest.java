@@ -1,5 +1,10 @@
 package com.kozak.mybookshop.service;
 
+import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategory;
+import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryRequestDto;
+import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryResponseDto;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.verify;
 
 import com.kozak.mybookshop.dto.category.CategoryRequestDto;
@@ -39,13 +44,15 @@ public class CategoryServiceTest {
     @Test
     @DisplayName("find all categories")
     void findAll_WithValidPageable_ShouldReturnPageOfCategoryDtos() {
-        Category category = new Category();
-        category.setName("test");
+        Category category = sampleCategory();
         Category category2 = new Category();
-        category2.setName("test2");
+        category.setId(2L);
+        category.setName("fantastic");
+        category.setDescription("about not real situation");
 
-        CategoryResponseDto dto1 = new CategoryResponseDto(1L,"test", "description");
-        CategoryResponseDto dto2 = new CategoryResponseDto(2L,"test2", "description2");
+        CategoryResponseDto dto1 = sampleCategoryResponseDto();
+        CategoryResponseDto dto2 =
+                new CategoryResponseDto(2L,"fantastic", "about not real situation");
 
         Page<Category> categoryPage = new PageImpl<>(Arrays.asList(category, category2));
         Pageable pageable = PageRequest.of(0, 10);
@@ -55,24 +62,19 @@ public class CategoryServiceTest {
         Mockito.when(categoryRepository.findAll(pageable)).thenReturn(categoryPage);
 
         Page<CategoryResponseDto> actual = categoryService.findAll(pageable);
-        Assertions.assertEquals(2, actual.getContent().size());
-        Assertions.assertEquals("test", actual.getContent().get(0).name());
+        assertEquals(2, actual.getContent().size());
+        assertEquals(dto1.name(), actual.getContent().get(0).name());
+        assertEquals(dto2.name(), actual.getContent().get(1).name());
     }
 
     @Test
     @DisplayName("save category when valid category provided")
     void save_WithValidCategory_ReturnCategoryDto() {
-        Category category = new Category();
-        category.setName("test");
-        category.setDescription("description");
-        Category savedCategory = new Category();
-        category.setId(1L);
-        savedCategory.setName("test");
-        savedCategory.setDescription("description");
+        Category category = sampleCategory();
+        Category savedCategory = sampleCategory();
 
-        CategoryRequestDto requestDto = new CategoryRequestDto();
-        requestDto.setName("test");
-        CategoryResponseDto dto = new CategoryResponseDto(1L,"test", "description");
+        CategoryRequestDto requestDto = sampleCategoryRequestDto();
+        CategoryResponseDto dto = sampleCategoryResponseDto();
 
         Mockito.when(categoryMapper.toEntity(requestDto)).thenReturn(category);
         Mockito.when(categoryMapper.toDto(savedCategory)).thenReturn(dto);
@@ -80,27 +82,28 @@ public class CategoryServiceTest {
 
         CategoryResponseDto actual = categoryService.save(requestDto);
         verify(categoryRepository).save(category);
-        Assertions.assertNotNull(actual);
-        Assertions.assertEquals(actual.name(), category.getName());
+        assertNotNull(actual);
+        assertEquals(actual.name(), category.getName());
+        assertEquals(actual.id(), savedCategory.getId());
+        assertEquals(actual.description(), savedCategory.getDescription());
     }
 
     @Test
     @DisplayName("get category when valid category id provided")
     void getById_WithValidCategoryId_ShouldReturnCategoryDto() {
         Long categoryId = 1L;
-        Category category = new Category();
-        category.setId(categoryId);
-        category.setName("test");
-        category.setDescription("description");
+        Category category = sampleCategory();
 
-        CategoryResponseDto dto = new CategoryResponseDto(1L,"test", "description");
+        CategoryResponseDto dto = sampleCategoryResponseDto();
 
         Mockito.when(categoryMapper.toDto(category)).thenReturn(dto);
         Mockito.when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
         CategoryResponseDto actual = categoryService.getById(categoryId);
         verify(categoryRepository).findById(categoryId);
-        Assertions.assertEquals(actual.name(), category.getName());
+        assertEquals(actual.name(), category.getName());
+        assertEquals(actual.id(), category.getId());
+        assertEquals(actual.description(), category.getDescription());
     }
 
     @Test
@@ -114,7 +117,7 @@ public class CategoryServiceTest {
         });
 
         String actual = exception.getMessage();
-        Assertions.assertEquals("Cannot find Category with id: " + categoryId, actual);
+        assertEquals("Cannot find Category with id: " + categoryId, actual);
     }
 
     @Test
@@ -129,8 +132,7 @@ public class CategoryServiceTest {
     @DisplayName("update category when invalid category id provided")
     void update_WithInValidId_ShouldThrowEntityNotFoundException() {
         Long categoryId = -100L;
-        CategoryRequestDto requestDto = new CategoryRequestDto();
-        requestDto.setName("test");
+        CategoryRequestDto requestDto = sampleCategoryRequestDto();
 
         Mockito.when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
         Exception exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
@@ -138,6 +140,6 @@ public class CategoryServiceTest {
         });
 
         String actual = exception.getMessage();
-        Assertions.assertEquals("Cannot find Category with id: " + categoryId, actual);
+        assertEquals("Cannot find Category with id: " + categoryId, actual);
     }
 }

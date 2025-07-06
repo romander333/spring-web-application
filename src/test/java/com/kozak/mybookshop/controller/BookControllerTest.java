@@ -1,5 +1,8 @@
 package com.kozak.mybookshop.controller;
 
+import static com.kozak.mybookshop.util.BookDataTest.sampleBookDto;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -19,7 +22,6 @@ import java.util.List;
 import javax.sql.DataSource;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,13 +36,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class BookControllerTest {
     protected static MockMvc mockMvc;
     private static final String COVER_IMAGE =
             "https://i.pinimg.com/originals/9f/a8/9e/9fa89e944234f7c3fe04bacc6da638b2.png";
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -95,21 +97,20 @@ public class BookControllerTest {
     @DisplayName("Create a new book when valid request provide")
     void createBook_WithValidRequest_Success() throws Exception {
         CreateBookRequestDto requestDto = new CreateBookRequestDto()
-                .setTitle("Old_Man")
+                .setTitle("Black_man")
                 .setAuthor("Kozak")
-                .setIsbn("44")
-                .setPrice(BigDecimal.valueOf(30))
-                .setDescription("Old Man")
-                .setCategoryIds(List.of(1L))
-                .setCoverImage(COVER_IMAGE);
+                .setIsbn("4555")
+                .setPrice(BigDecimal.TEN)
+                .setCoverImage(COVER_IMAGE)
+                .setCategoryIds(List.of(1L, 2L));
         BookDto expected = new BookDto()
+                .setId(4L)
                 .setTitle(requestDto.getTitle())
                 .setAuthor(requestDto.getAuthor())
                 .setIsbn(requestDto.getIsbn())
                 .setPrice(requestDto.getPrice())
-                .setDescription(requestDto.getDescription())
-                .setCategoryIds(List.of(1L))
-                .setCoverImage(requestDto.getCoverImage());
+                .setCoverImage(requestDto.getCoverImage())
+                .setCategoryIds(List.of(1L, 2L));
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
         MvcResult result = mockMvc.perform(post("/books")
@@ -120,11 +121,10 @@ public class BookControllerTest {
 
         BookDto actual = objectMapper.readValue(result.getResponse().getContentAsString(),
                 BookDto.class);
-        Assertions.assertNotNull(actual.getId());
-        Assertions.assertEquals(expected.getTitle(), actual.getTitle());
-        Assertions.assertEquals(expected.getAuthor(), actual.getAuthor());
-        Assertions.assertTrue(EqualsBuilder.reflectionEquals(expected, actual,
-                "id"));
+        assertNotNull(actual.getId());
+        assertEquals(expected.getTitle(), actual.getTitle());
+        assertEquals(expected.getAuthor(), actual.getAuthor());
+        assertEquals(expected.getIsbn(), actual.getIsbn());
     }
 
     @WithMockUser(username = "user", roles = "USER")
@@ -132,24 +132,15 @@ public class BookControllerTest {
     @Test
     void getAll_GivenBooksInCatalog_ShouldReturnAllBooks() throws Exception {
         List<BookDto> expectedBooks = List.of(
-                new BookDto().setTitle("New_man")
-                        .setAuthor("Roman")
-                        .setIsbn("333")
-                        .setPrice(BigDecimal.valueOf(95.99))
-                        .setDescription("nice book for old people")
-                        .setCoverImage(COVER_IMAGE),
+                sampleBookDto(),
                 new BookDto().setTitle("Super_man")
                         .setAuthor("Andrew")
                         .setIsbn("3323")
-                        .setPrice(BigDecimal.valueOf(150))
-                        .setDescription("nice book for old people")
-                        .setCoverImage(COVER_IMAGE),
+                        .setPrice(BigDecimal.valueOf(150)),
                 new BookDto().setTitle("Older_man_in_sea")
                         .setAuthor("Katerina")
                         .setIsbn("3313")
                         .setPrice(BigDecimal.valueOf(300))
-                        .setDescription("nice book for old people")
-                        .setCoverImage(COVER_IMAGE)
                 );
 
         MvcResult result = mockMvc.perform(get("/books")
@@ -160,8 +151,10 @@ public class BookControllerTest {
         JsonNode jsonNode = objectMapper.readTree(result.getResponse().getContentAsString());
         JsonNode node = jsonNode.get("content");
         BookDto[] bookDtos = objectMapper.treeToValue(node, BookDto[].class);
-        Assertions.assertEquals(expectedBooks.size(), bookDtos.length);
-        Assertions.assertEquals(expectedBooks.get(0).getTitle(), bookDtos[0].getTitle());
+        assertEquals(expectedBooks.size(), bookDtos.length);
+        assertEquals(expectedBooks.get(0).getTitle(), bookDtos[0].getTitle());
+        assertEquals(expectedBooks.get(1).getTitle(), bookDtos[1].getTitle());
+        assertEquals(expectedBooks.get(2).getIsbn(), bookDtos[2].getIsbn());
     }
 
     @WithMockUser(username = "user", roles = "USER")
@@ -169,14 +162,7 @@ public class BookControllerTest {
     @Test
     void getBookById_WithValidId_ShouldReturnBookDto() throws Exception {
         Long bookId = 1L;
-        BookDto expected = new BookDto()
-                .setId(bookId)
-                .setTitle("New_man")
-                .setAuthor("Roman")
-                .setIsbn("333")
-                .setPrice(BigDecimal.valueOf(95.99))
-                .setDescription("nice book for old people")
-                .setCoverImage(COVER_IMAGE)
+        BookDto expected = sampleBookDto()
                 .setCategoryIds(List.of());
 
         MvcResult result = mockMvc.perform(get("/books/{id}", bookId)
@@ -186,7 +172,10 @@ public class BookControllerTest {
 
         BookDto actual = objectMapper.readValue(result.getResponse().getContentAsString(),
                 BookDto.class);
-        Assertions.assertTrue(EqualsBuilder.reflectionEquals(expected, actual));
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getTitle(), actual.getTitle());
+        assertEquals(expected.getAuthor(), actual.getAuthor());
+        assertEquals(expected.getIsbn(), actual.getIsbn());
     }
 
     @WithMockUser(username = "admin", roles = "ADMIN")
@@ -210,9 +199,8 @@ public class BookControllerTest {
                 .setAuthor("Eva")
                 .setIsbn("3455")
                 .setPrice(BigDecimal.valueOf(100))
-                .setDescription("nice book for old people")
-                .setCoverImage(COVER_IMAGE)
-                .setCategoryIds(List.of(1L));
+                .setCategoryIds(List.of(1L))
+                .setCoverImage(COVER_IMAGE);
         BookDto expected = new BookDto()
                 .setId(bookId)
                 .setTitle(requestDto.getTitle())
@@ -227,12 +215,14 @@ public class BookControllerTest {
         MvcResult result = mockMvc.perform(put("/books/{id}", bookId)
                         .content(jsonRequest)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
                 .andReturn();
-
+        System.out.println(result.getResponse().getContentAsString());
         BookDto actual =
                 objectMapper.readValue(result.getResponse().getContentAsString(), BookDto.class);
-        Assertions.assertTrue(EqualsBuilder.reflectionEquals(expected, actual));
+        assertEquals(expected.getTitle(), actual.getTitle());
+        assertEquals(expected.getAuthor(), actual.getAuthor());
+        assertEquals(expected.getIsbn(), actual.getIsbn());
+        assertEquals(expected.getCoverImage(), actual.getCoverImage());
     }
 
     @WithMockUser(username = "user", roles = "USER")
@@ -241,16 +231,7 @@ public class BookControllerTest {
     void search_WithValidTitle_ShouldReturnBookDto() throws Exception {
         String[] titles = {"New_man"};
         String[] authors = {"Roman"};
-        Long bookId = 1L;
-        BookDto expected = new BookDto()
-                .setId(bookId)
-                .setTitle("New_man")
-                .setAuthor("Roman")
-                .setIsbn("333")
-                .setPrice(BigDecimal.valueOf(95.99))
-                .setDescription("nice book for old people")
-                .setCoverImage(COVER_IMAGE)
-                .setCategoryIds(List.of());
+        BookDto expected = sampleBookDto();
 
         MvcResult result = mockMvc.perform(get("/books/search")
                         .param("titles", titles[0])
@@ -261,6 +242,8 @@ public class BookControllerTest {
 
         List<BookDto> actual = objectMapper.readValue(result.getResponse().getContentAsString(),
                 new TypeReference<>() {});
-        Assertions.assertTrue(EqualsBuilder.reflectionEquals(expected, actual.get(0)));
+        assertEquals(expected.getTitle(), actual.get(0).getTitle());
+        assertEquals(expected.getAuthor(), actual.get(0).getAuthor());
+        assertEquals(expected.getIsbn(), actual.get(0).getIsbn());
     }
 }

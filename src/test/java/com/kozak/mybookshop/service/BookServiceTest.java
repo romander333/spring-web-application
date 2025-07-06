@@ -1,5 +1,14 @@
 package com.kozak.mybookshop.service;
 
+import static com.kozak.mybookshop.util.BookDataTest.anotherSampleBook;
+import static com.kozak.mybookshop.util.BookDataTest.anotherSampleBookDtoWithoutCategoryIds;
+import static com.kozak.mybookshop.util.BookDataTest.sampleBook;
+import static com.kozak.mybookshop.util.BookDataTest.sampleBookDto;
+import static com.kozak.mybookshop.util.BookDataTest.sampleBookDtoWithoutCategoryIds;
+import static com.kozak.mybookshop.util.BookDataTest.sampleCreateBookRequestDto;
+import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.verify;
 
 import com.kozak.mybookshop.dto.book.BookDto;
@@ -11,6 +20,7 @@ import com.kozak.mybookshop.model.Book;
 import com.kozak.mybookshop.model.Category;
 import com.kozak.mybookshop.repository.book.BookRepository;
 import com.kozak.mybookshop.service.book.BookServiceImpl;
+import com.kozak.mybookshop.util.BookDataTest;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +47,9 @@ public class BookServiceTest {
     @Mock
     private BookMapper bookMapper;
 
+    @Mock
+    private BookDataTest testUtil;
+
     @InjectMocks
     private BookServiceImpl bookService;
 
@@ -44,21 +57,19 @@ public class BookServiceTest {
     @DisplayName("get book when valid book id provided")
     void getById_WithValidBookId_ShouldReturnBook() {
         Long bookId = 1L;
-        Book book = new Book();
-        book.setId(bookId);
-        book.setTitle("Good_Book");
+        Book book = sampleBook();
 
-        BookDto bookDto = new BookDto();
-        bookDto.setTitle("Good_Book");
+        BookDto expected = sampleBookDto();
 
         Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-        Mockito.when(bookMapper.toBookDto(book)).thenReturn(bookDto);
+        Mockito.when(bookMapper.toBookDto(book)).thenReturn(expected);
 
-        String actual = bookService.getById(bookId).getTitle();
-        String expected = "Good_Book";
+        BookDto actual = bookService.getById(bookId);
 
         verify(bookRepository).findById(bookId);
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected.getTitle(), actual.getTitle());
+        assertEquals(expected.getAuthor(), actual.getAuthor());
+        assertEquals(expected.getIsbn(), actual.getIsbn());
     }
 
     @Test
@@ -73,31 +84,24 @@ public class BookServiceTest {
         String actual = exception.getMessage();
 
         verify(bookRepository).findById(bookId);
-        Assertions.assertEquals("Book not found by id:" + bookId, actual);
+        assertEquals("Book not found by id:" + bookId, actual);
     }
 
     @Test
     @DisplayName("get books when valid category id provided ")
     void getBooksByCategoryId_WithValidCategoryId_ShouldReturnBooks() {
-        Long categoryId = 1L;
-        Category category = new Category();
-        category.setId(categoryId);
+        Category category = sampleCategory();
         Set<Category> categories = new HashSet<>();
         categories.add(category);
 
-        Book book = new Book();
-        book.setId(1L);
-        book.setTitle("Good_Book");
+        Book book = sampleBook();
         book.setCategories(categories);
-        Book book2 = new Book();
-        book2.setId(2L);
-        book2.setTitle("Bad_Book");
+        Book book2 = anotherSampleBook();
         book2.setCategories(categories);
+        Long categoryId = 1L;
 
-        BookDtoWithoutCategoryIds dto1 = new BookDtoWithoutCategoryIds();
-        dto1.setTitle("Good_Book");
-        BookDtoWithoutCategoryIds dto2 = new BookDtoWithoutCategoryIds();
-        dto2.setTitle("Bad_Book");
+        BookDtoWithoutCategoryIds dto1 = sampleBookDtoWithoutCategoryIds();
+        BookDtoWithoutCategoryIds dto2 = anotherSampleBookDtoWithoutCategoryIds();
 
         Mockito.when(bookMapper.toDtoWithoutCategories(book)).thenReturn(dto1);
         Mockito.when(bookMapper.toDtoWithoutCategories(book2)).thenReturn(dto2);
@@ -106,27 +110,18 @@ public class BookServiceTest {
         List<BookDtoWithoutCategoryIds> books = bookService.getBooksByCategoryId(categoryId);
 
         verify(bookRepository).findByCategories_Id(categoryId);
-        Assertions.assertEquals(2, books.size());
-        Assertions.assertEquals("Good_Book", books.get(0).getTitle());
-        Assertions.assertEquals("Bad_Book", books.get(1).getTitle());
+        assertEquals(2, books.size());
+        assertEquals("Good_Book", books.get(0).getTitle());
+        assertEquals("Bad_Book", books.get(1).getTitle());
     }
 
     @Test
     @DisplayName("save book when valid book provided")
     void save_WithValidBook_ShouldSaveAndReturnBookDto() {
-        Book book = new Book();
-        book.setTitle("Good_Book");
-
-        Book savedBook = new Book();
-        savedBook.setId(1L);
-        savedBook.setTitle("Good_Book");
-
-        BookDto bookDto = new BookDto();
-        bookDto.setId(1L);
-        bookDto.setTitle("Good_Book");
-
-        CreateBookRequestDto createBookRequestDto = new CreateBookRequestDto();
-        createBookRequestDto.setTitle("Good_Book");
+        Book book = sampleBook();
+        Book savedBook = sampleBook();
+        BookDto bookDto = sampleBookDto();
+        CreateBookRequestDto createBookRequestDto = sampleCreateBookRequestDto();
 
         Mockito.when(bookMapper.toBookDto(savedBook)).thenReturn(bookDto);
         Mockito.when(bookMapper.toModel(createBookRequestDto)).thenReturn(book);
@@ -134,8 +129,11 @@ public class BookServiceTest {
 
         BookDto actual = bookService.save(createBookRequestDto);
         verify(bookRepository).save(book);
-        Assertions.assertNotNull(actual);
-        Assertions.assertEquals("Good_Book", actual.getTitle());
+        assertNotNull(actual);
+        assertEquals(createBookRequestDto.getTitle(), actual.getTitle());
+        assertEquals(createBookRequestDto.getAuthor(), actual.getAuthor());
+        assertEquals(createBookRequestDto.getIsbn(), actual.getIsbn());
+
     }
 
     @Test
@@ -149,18 +147,11 @@ public class BookServiceTest {
     @Test
     @DisplayName("find all books")
     void findAll_WithValidPageable_ReturnPageOfBookDtos() {
-        Long bookId = 1L;
-        Book book = new Book();
-        book.setId(bookId);
-        book.setTitle("Good_Book");
-        Book book2 = new Book();
-        book2.setId(2L);
-        book2.setTitle("Bad_Book");
+        Book book = sampleBook();
+        Book book2 = anotherSampleBook();
 
-        BookDtoWithoutCategoryIds dto1 = new BookDtoWithoutCategoryIds();
-        dto1.setTitle("Good_Book");
-        BookDtoWithoutCategoryIds dto2 = new BookDtoWithoutCategoryIds();
-        dto2.setTitle("Bad_Book");
+        BookDtoWithoutCategoryIds dto1 = sampleBookDtoWithoutCategoryIds();
+        BookDtoWithoutCategoryIds dto2 = anotherSampleBookDtoWithoutCategoryIds();
 
         Page<Book> bookPage = new PageImpl<>(List.of(book, book2));
         Pageable pageable = PageRequest.of(0, 10);
@@ -169,9 +160,9 @@ public class BookServiceTest {
         Mockito.when(bookRepository.findAll(pageable)).thenReturn(bookPage);
 
         Page<BookDtoWithoutCategoryIds> actual = bookService.findAll(pageable);
-        Assertions.assertEquals(2, actual.getContent().size());
-        Assertions.assertEquals("Good_Book", actual.getContent().get(0).getTitle());
-        Assertions.assertEquals("Bad_Book", actual.getContent().get(1).getTitle());
+        assertEquals(2, actual.getContent().size());
+        assertEquals("Good_Book", actual.getContent().get(0).getTitle());
+        assertEquals("Bad_Book", actual.getContent().get(1).getTitle());
     }
 
     @Test
@@ -179,8 +170,7 @@ public class BookServiceTest {
     void update_WithInValidId_ShouldThrowEntityNotFoundException() {
         Long bookId = -100L;
 
-        CreateBookRequestDto createBookRequestDto = new CreateBookRequestDto();
-        createBookRequestDto.setTitle("Good_Book");
+        CreateBookRequestDto createBookRequestDto = sampleCreateBookRequestDto();
 
         Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
         Exception exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
@@ -188,6 +178,6 @@ public class BookServiceTest {
         });
         String actual = exception.getMessage();
 
-        Assertions.assertEquals("Book not found by id:" + bookId, actual);
+        assertEquals("Book not found by id:" + bookId, actual);
     }
 }
