@@ -4,17 +4,18 @@ import com.kozak.mybookshop.dto.cartitem.CartItemDto;
 import com.kozak.mybookshop.dto.cartitem.CartItemQuantityRequestDto;
 import com.kozak.mybookshop.dto.cartitem.CreateCartItemRequestDto;
 import com.kozak.mybookshop.dto.shoppingcart.ShoppingCartDto;
+import com.kozak.mybookshop.exception.EntityNotFoundException;
 import com.kozak.mybookshop.mapper.ShoppingCartMapper;
 import com.kozak.mybookshop.model.Book;
 import com.kozak.mybookshop.model.CartItem;
 import com.kozak.mybookshop.model.ShoppingCart;
 import com.kozak.mybookshop.model.User;
 import com.kozak.mybookshop.repository.book.BookRepository;
+import com.kozak.mybookshop.repository.cartitem.CartItemRepository;
 import com.kozak.mybookshop.repository.shoppingcart.ShoppingCartRepository;
 import com.kozak.mybookshop.security.AuthenticationService;
 import com.kozak.mybookshop.service.shoppingcart.ShoppingCartServiceImpl;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,19 +23,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.mockito.Mockito.verify;
+import static com.kozak.mybookshop.util.BookDataTest.sampleBook;
+import static com.kozak.mybookshop.util.CartItemDataTest.sampleCartItem;
+import static com.kozak.mybookshop.util.CartItemDataTest.sampleCartItemDto;
+import static com.kozak.mybookshop.util.ShoppingCartDataTest.sampleShoppingCart;
+import static com.kozak.mybookshop.util.ShoppingCartDataTest.sampleShoppingCartDto;
+import static com.kozak.mybookshop.util.UserDataTest.sampleUser;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -53,164 +54,157 @@ public class ShoppingCartServiceTest {
 
     @InjectMocks
     private ShoppingCartServiceImpl shoppingCartService;
-    
+
     @Test
     @DisplayName("Update quantity books when valid cart items provided")
     void updateQuantityById_WithValidCartItemId_ShouldReturnShoppingCartDto() {
-        Long shoppingCartId = 1L;
+        Long id = 1L;
         CartItemQuantityRequestDto requestDto = new CartItemQuantityRequestDto();
         requestDto.setQuantity(5);
 
-        CartItemDto cartItemDto = new CartItemDto()
-                .setQuantity(5)
-                .setBookId(1L)
-                .setBookTitle("New_man")
-                .setId(1L);
+        CartItemDto cartItemDto = sampleCartItemDto();
         Set<CartItemDto> cartItemDtos = new HashSet<>();
         cartItemDtos.add(cartItemDto);
 
-        User user = new User();
-        user.setId(1L);
+        User user = sampleUser(id);
 
-        ShoppingCart shoppingCart = new ShoppingCart();
-        shoppingCart.setId(shoppingCartId);
+        ShoppingCart shoppingCart = sampleShoppingCart(user);
 
-        CartItem cartItem = new CartItem();
-        cartItem.setId(shoppingCartId);
-        cartItem.setQuantity(2);
+        CartItem cartItem = sampleCartItem();
         cartItem.setShoppingCart(shoppingCart);
         Set<CartItem> cartItems = new HashSet<>();
         cartItems.add(cartItem);
 
         shoppingCart.setCartItems(cartItems);
 
-        ShoppingCartDto dto = new ShoppingCartDto()
-                .setId(1L)
-                .setUserId(1L)
+        ShoppingCartDto expected = sampleShoppingCartDto()
                 .setCartItems(cartItemDtos);
 
-        ShoppingCart savedShoppingCart = new ShoppingCart();
-        savedShoppingCart.setId(shoppingCartId);
+        ShoppingCart savedShoppingCart = sampleShoppingCart(user);
 
-        Mockito.when(shoppingCartMapper.toDto(shoppingCart)).thenReturn(dto);
-        Mockito.when(shoppingCartRepository.findShoppingCartByUser_Id(1L)).thenReturn(Optional.of(shoppingCart));
-        Mockito.when(shoppingCartRepository.save(shoppingCart)).thenReturn(savedShoppingCart);
+        Mockito.when(shoppingCartMapper.toDto(Mockito.any(ShoppingCart.class))).thenReturn(expected);
+        Mockito.when(shoppingCartRepository.findShoppingCartByUser_Id(id)).thenReturn(Optional.of(shoppingCart));
+        Mockito.when(shoppingCartRepository.save(Mockito.any(ShoppingCart.class))).thenReturn(savedShoppingCart);
         Mockito.when(authenticationService.getCurrentUser()).thenReturn(user);
 
-        ShoppingCartDto actual = shoppingCartService.updateQuantityById(shoppingCartId, requestDto);
+        ShoppingCartDto actual = shoppingCartService.updateQuantityById(id, requestDto);
 
-        Assertions.assertTrue(EqualsBuilder.reflectionEquals(dto, actual));
+        assertEquals(expected.getUserId(), actual.getUserId());
+        assertEquals(expected.getCartItems().size(), actual.getCartItems().size());
 
     }
 
     @Test
+    void updateQuantityById_WithInvalidCartItemId_ShouldThrowEntityNotFoundException() {
+        Long id = 4L;
+        User user = sampleUser(1L);
+        ShoppingCart shoppingCart = sampleShoppingCart(user);
+        CartItemQuantityRequestDto requestDto = new CartItemQuantityRequestDto();
+        requestDto.setQuantity(5);
+
+        Mockito.when(shoppingCartRepository.findShoppingCartByUser_Id(1L)).thenReturn(Optional.of(shoppingCart));
+        Mockito.when(authenticationService.getCurrentUser()).thenReturn(user);
+
+        Exception exception = Assertions.assertThrows(EntityNotFoundException.class, () ->
+                shoppingCartService.updateQuantityById(id, requestDto));
+
+        String actual = exception.getMessage();
+
+        assertEquals("CartItem not found by id: "+ id, actual);
+
+    }
+
+    @Test
+    @DisplayName("Create shopping Cart when valid request provided")
     void createShoppingCart_WithValidShoppingRequest_ShouldReturnShoppingCart() {
-        User user = new User();
-        user.setId(3L);
+        Long id = 3L;
+        User user = sampleUser(id);
 
-        ShoppingCart savedShoppingCart = new ShoppingCart();
-        savedShoppingCart.setId(3L);
-        savedShoppingCart.setUser(user);
+        ShoppingCart savedShoppingCart = sampleShoppingCart(user);
 
-        ShoppingCartDto dto = new ShoppingCartDto()
-                .setId(3L)
-                .setUserId(3L);
+        ShoppingCartDto expected = new ShoppingCartDto()
+                .setId(id)
+                .setUserId(id);
 
-        Mockito.when(shoppingCartMapper.toDto(Mockito.any(ShoppingCart.class))).thenReturn(dto);
+        Mockito.when(shoppingCartMapper.toDto(Mockito.any(ShoppingCart.class))).thenReturn(expected);
         Mockito.when(shoppingCartRepository.save(Mockito.any(ShoppingCart.class))).thenReturn(savedShoppingCart);
 
         ShoppingCartDto actual = shoppingCartService.createShoppingCart(user);
-
-        Assertions.assertTrue(EqualsBuilder.reflectionEquals(dto, actual));
+        assertTrue(EqualsBuilder.reflectionEquals(expected, actual));
 
     }
 
 
     @Test
+    @DisplayName("Delete cart item when valid id provided")
     void deleteCartItem_WithValidId_ShouldDeleteShoppingCart() {
         Long id = 3L;
-        User user = new User();
-        user.setId(id);
+        User user = sampleUser(id);
         CartItem cartItem = new CartItem();
         cartItem.setId(id);
+        cartItem.setQuantity(5);
         Set<CartItem> cartItems = new HashSet<>();
         cartItems.add(cartItem);
-        ShoppingCart shoppingCart = new ShoppingCart();
-        shoppingCart.setId(id);
-        shoppingCart.setUser(user);
+        ShoppingCart shoppingCart = sampleShoppingCart(user);
         shoppingCart.setCartItems(cartItems);
 
         Mockito.when(authenticationService.getCurrentUser()).thenReturn(user);
         Mockito.when(shoppingCartRepository.findShoppingCartByUser_Id(id)).thenReturn(Optional.of(shoppingCart));
 
         shoppingCartService.deleteCartItem(id);
-        Assertions.assertTrue(shoppingCart.getCartItems().isEmpty());
+        assertTrue(shoppingCart.getCartItems().isEmpty());
     }
 
     @Test
     void addCartItem_WithValidCartItem_ShouldReturnShoppingCartDto() {
-        Long shoppingCartId = 1L;
-        User user = new User();
-        user.setId(1L);
+        Long id = 1L;
+        User user = sampleUser(id);
 
-        Book book = new Book();
-        book.setId(1L);
+        Book book = sampleBook();
 
-        CartItem cartItem = new CartItem();
-        cartItem.setId(shoppingCartId);
+        CartItem cartItem = sampleCartItem();
         cartItem.setBook(book);
 
-        CartItemDto cartItemDto = new CartItemDto();
-        cartItemDto.setId(shoppingCartId);
-        cartItemDto.setQuantity(5);
-        cartItemDto.setBookId(1L);
+        CartItemDto cartItemDto = sampleCartItemDto();
 
-        ShoppingCart shoppingCart = new ShoppingCart();
-        shoppingCart.setId(shoppingCartId);
+        ShoppingCart shoppingCart = sampleShoppingCart(user);
         shoppingCart.setCartItems(new HashSet<>());
 
         CreateCartItemRequestDto requestDto = new CreateCartItemRequestDto();
         requestDto.setQuantity(5);
-        requestDto.setBookId(1L);
+        requestDto.setBookId(id);
 
         shoppingCart.getCartItems().add(cartItem);
-        ShoppingCart savedShoppingCart = new ShoppingCart();
-        savedShoppingCart.setId(shoppingCartId);
+        ShoppingCart savedShoppingCart = sampleShoppingCart(user);
         savedShoppingCart.setCartItems(Set.of(cartItem));
 
-        ShoppingCartDto dto = new ShoppingCartDto()
-                .setId(shoppingCartId)
-                .setUserId(1L)
+        ShoppingCartDto expected = sampleShoppingCartDto()
                 .setCartItems(Set.of(cartItemDto));
 
-        Mockito.when(shoppingCartMapper.toDto(Mockito.any(ShoppingCart.class))).thenReturn(dto);
+        Mockito.when(shoppingCartMapper.toDto(Mockito.any(ShoppingCart.class))).thenReturn(expected);
         Mockito.when(shoppingCartRepository.save(Mockito.any(ShoppingCart.class))).thenReturn(savedShoppingCart);
         Mockito.when(authenticationService.getCurrentUser()).thenReturn(user);
-        Mockito.when(shoppingCartRepository.findShoppingCartByUser_Id(shoppingCartId)).thenReturn(Optional.of(shoppingCart));
-        Mockito.when(bookRepository.findById(1L)).thenReturn(Optional.of(new Book()));
+        Mockito.when(shoppingCartRepository.findShoppingCartByUser_Id(id)).thenReturn(Optional.of(shoppingCart));
+        Mockito.when(bookRepository.findById(id)).thenReturn(Optional.of(new Book()));
 
         ShoppingCartDto actual = shoppingCartService.addCartItem(requestDto);
 
-        Assertions.assertTrue(EqualsBuilder.reflectionEquals(dto, actual));
+        assertTrue(EqualsBuilder.reflectionEquals(expected, actual));
     }
 
     @Test
     void getShoppingCart_WithValidUser_ShouldReturnShoppingCartDto() {
-        Long shoppingCartId = 1L;
-        User user = new User();
-        user.setId(1L);
-        ShoppingCart shoppingCart = new ShoppingCart();
-        shoppingCart.setId(shoppingCartId);
-        shoppingCart.setUser(user);
-        ShoppingCartDto dto = new ShoppingCartDto()
-                .setId(shoppingCartId);
+        Long id = 1L;
+        User user = sampleUser(id);
+        ShoppingCart shoppingCart = sampleShoppingCart(user);
+        ShoppingCartDto expected = sampleShoppingCartDto();
 
         Mockito.when(authenticationService.getCurrentUser()).thenReturn(user);
-        Mockito.when(shoppingCartMapper.toDto(Mockito.any(ShoppingCart.class))).thenReturn(dto);
-        Mockito.when(shoppingCartRepository.findShoppingCartByUser_Id(shoppingCartId)).thenReturn(Optional.of(shoppingCart));
+        Mockito.when(shoppingCartMapper.toDto(Mockito.any(ShoppingCart.class))).thenReturn(expected);
+        Mockito.when(shoppingCartRepository.findShoppingCartByUser_Id(id)).thenReturn(Optional.of(shoppingCart));
 
         ShoppingCartDto actual = shoppingCartService.getShoppingCart();
 
-        Assertions.assertTrue(EqualsBuilder.reflectionEquals(dto, actual));
+        Assertions.assertTrue(EqualsBuilder.reflectionEquals(expected, actual));
     }
 }

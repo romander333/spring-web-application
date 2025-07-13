@@ -47,9 +47,6 @@ public class BookServiceTest {
     @Mock
     private BookMapper bookMapper;
 
-    @Mock
-    private BookDataTest testUtil;
-
     @InjectMocks
     private BookServiceImpl bookService;
 

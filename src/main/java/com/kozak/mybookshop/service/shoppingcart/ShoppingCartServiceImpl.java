@@ -87,7 +87,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
         Book book = bookRepository.findById(requestDto.getBookId())
                 .orElseThrow(() ->
-                        new RuntimeException("Book not found by id " + requestDto.getBookId()));
+                        new EntityNotFoundException("Book not found by id " + requestDto.getBookId()));
 
         Optional<CartItem> existingItemOpt = shoppingCart.getCartItems().stream()
                 .filter(cartItem -> cartItem.getBook().getId().equals(book.getId()))
