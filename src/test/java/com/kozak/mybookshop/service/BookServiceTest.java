@@ -94,25 +94,31 @@ public class BookServiceTest {
         Set<Category> categories = new HashSet<>();
         categories.add(category);
 
-        Book book = sampleBook();
-        book.setCategories(categories);
-        Book book2 = anotherSampleBook();
-        book2.setCategories(categories);
+        Book expected1 = sampleBook();
+        expected1.setCategories(categories);
+        Book expected2 = anotherSampleBook();
+        expected2.setCategories(categories);
         Long categoryId = 1L;
 
         BookDtoWithoutCategoryIds dto1 = sampleBookDtoWithoutCategoryIds();
         BookDtoWithoutCategoryIds dto2 = anotherSampleBookDtoWithoutCategoryIds();
 
-        Mockito.when(bookMapper.toDtoWithoutCategories(book)).thenReturn(dto1);
-        Mockito.when(bookMapper.toDtoWithoutCategories(book2)).thenReturn(dto2);
+        Mockito.when(bookMapper.toDtoWithoutCategories(expected1)).thenReturn(dto1);
+        Mockito.when(bookMapper.toDtoWithoutCategories(expected2)).thenReturn(dto2);
         Mockito.when(bookRepository.findByCategories_Id(categoryId))
-                .thenReturn(List.of(book, book2));
-        List<BookDtoWithoutCategoryIds> books = bookService.getBooksByCategoryId(categoryId);
+                .thenReturn(List.of(expected1, expected2));
+        List<BookDtoWithoutCategoryIds> actual = bookService.getBooksByCategoryId(categoryId);
 
         verify(bookRepository).findByCategories_Id(categoryId);
-        assertEquals(2, books.size());
-        assertEquals("Good_Book", books.get(0).getTitle());
-        assertEquals("Bad_Book", books.get(1).getTitle());
+        assertEquals(2, actual.size());
+        assertEquals(expected1.getTitle(), actual.get(0).getTitle());
+        assertEquals(expected1.getAuthor(), actual.get(0).getAuthor());
+        assertEquals(expected1.getIsbn(), actual.get(0).getIsbn());
+        assertEquals(expected1.getCoverImage(), actual.get(0).getCoverImage());
+        assertEquals(expected2.getTitle(), actual.get(1).getTitle());
+        assertEquals(expected2.getAuthor(), actual.get(1).getAuthor());
+        assertEquals(expected2.getIsbn(), actual.get(1).getIsbn());
+        assertEquals(expected2.getCoverImage(), actual.get(1).getCoverImage());
     }
 
     @Test
@@ -147,22 +153,28 @@ public class BookServiceTest {
     @Test
     @DisplayName("find all books")
     void findAll_WithValidPageable_ReturnPageOfBookDtos() {
-        Book book = sampleBook();
-        Book book2 = anotherSampleBook();
+        Book expected1 = sampleBook();
+        Book expected2 = anotherSampleBook();
 
         BookDtoWithoutCategoryIds dto1 = sampleBookDtoWithoutCategoryIds();
         BookDtoWithoutCategoryIds dto2 = anotherSampleBookDtoWithoutCategoryIds();
 
-        Page<Book> bookPage = new PageImpl<>(List.of(book, book2));
+        Page<Book> bookPage = new PageImpl<>(List.of(expected1, expected2));
         Pageable pageable = PageRequest.of(0, 10);
-        Mockito.when(bookMapper.toDtoWithoutCategories(book)).thenReturn(dto1);
-        Mockito.when(bookMapper.toDtoWithoutCategories(book2)).thenReturn(dto2);
+        Mockito.when(bookMapper.toDtoWithoutCategories(expected1)).thenReturn(dto1);
+        Mockito.when(bookMapper.toDtoWithoutCategories(expected2)).thenReturn(dto2);
         Mockito.when(bookRepository.findAll(pageable)).thenReturn(bookPage);
 
         Page<BookDtoWithoutCategoryIds> actual = bookService.findAll(pageable);
         assertEquals(2, actual.getContent().size());
-        assertEquals("Good_Book", actual.getContent().get(0).getTitle());
-        assertEquals("Bad_Book", actual.getContent().get(1).getTitle());
+        assertEquals(expected1.getTitle(), actual.getContent().get(0).getTitle());
+        assertEquals(expected1.getAuthor(), actual.getContent().get(0).getAuthor());
+        assertEquals(expected1.getIsbn(), actual.getContent().get(0).getIsbn());
+        assertEquals(expected1.getCoverImage(), actual.getContent().get(0).getCoverImage());
+        assertEquals(expected2.getTitle(), actual.getContent().get(1).getTitle());
+        assertEquals(expected2.getAuthor(), actual.getContent().get(1).getAuthor());
+        assertEquals(expected2.getIsbn(), actual.getContent().get(1).getIsbn());
+        assertEquals(expected2.getCoverImage(), actual.getContent().get(1).getCoverImage());
     }
 
     @Test

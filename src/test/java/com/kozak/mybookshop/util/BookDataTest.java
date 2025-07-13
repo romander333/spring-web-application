@@ -53,9 +53,9 @@ public class BookDataTest {
 
     public static BookDtoWithoutCategoryIds sampleBookDtoWithoutCategoryIds() {
         return new BookDtoWithoutCategoryIds()
-                .setAuthor("Kozak")
-                .setTitle("Good_Book")
-                .setIsbn("123456789")
+                .setAuthor("Roman")
+                .setTitle("New_man")
+                .setIsbn("333")
                 .setPrice(BigDecimal.valueOf(99.99))
                 .setCoverImage(COVER_IMAGE);
     }

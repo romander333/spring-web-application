@@ -3,6 +3,7 @@ package com.kozak.mybookshop.controller;
 import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryRequestDto;
 import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryResponseDto;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -23,7 +24,6 @@ import java.util.List;
 import javax.sql.DataSource;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -125,7 +125,7 @@ public class CategoryControllerTest {
         CategoryResponseDto actual =
                 objectMapper.readValue(result.getResponse().getContentAsString(),
                         CategoryResponseDto.class);
-        Assertions.assertTrue(EqualsBuilder.reflectionEquals(actual,expected));
+        assertTrue(EqualsBuilder.reflectionEquals(actual,expected));
 
     }
 
@@ -147,8 +147,12 @@ public class CategoryControllerTest {
         JsonNode node = jsonNode.get("content");
         CategoryResponseDto[] actual = objectMapper.treeToValue(node,CategoryResponseDto[].class);
         assertEquals(expected.size(), actual.length);
+        assertEquals(expected.get(0).id(), actual[0].id());
         assertEquals(expected.get(0).name(), actual[0].name());
+        assertEquals(expected.get(0).description(), actual[0].description());
         assertEquals(expected.get(1).description(), actual[1].description());
+        assertEquals(expected.get(1).id(), actual[1].id());
+        assertEquals(expected.get(1).name(), actual[1].name());
     }
 
     @WithMockUser(username = "user", roles = "USER")
@@ -166,6 +170,7 @@ public class CategoryControllerTest {
         CategoryResponseDto actual =
                 objectMapper.readValue(result.getResponse().getContentAsString(),
                         CategoryResponseDto.class);
+        assertEquals(expected.id(), actual.id());
         assertEquals(expected.name(), actual.name());
         assertEquals(expected.description(), actual.description());
     }
@@ -188,6 +193,7 @@ public class CategoryControllerTest {
         CategoryResponseDto actual =
                 objectMapper.readValue(
                         result.getResponse().getContentAsString(), CategoryResponseDto.class);
+        assertEquals(expected.id(), actual.id());
         assertEquals(expected.name(), actual.name());
         assertEquals(expected.description(), actual.description());
     }
@@ -238,8 +244,12 @@ public class CategoryControllerTest {
         assertEquals(expected.size(), actual.size());
         assertEquals(expected.get(0).getTitle(), actual.get(0).getTitle());
         assertEquals(expected.get(0).getIsbn(), actual.get(0).getIsbn());
+        assertEquals(expected.get(0).getAuthor(), actual.get(0).getAuthor());
+        assertEquals(expected.get(0).getCoverImage(), actual.get(0).getCoverImage());
+        assertEquals(expected.get(1).getTitle(), actual.get(1).getTitle());
         assertEquals(expected.get(1).getAuthor(), actual.get(1).getAuthor());
         assertEquals(expected.get(1).getCoverImage(), actual.get(1).getCoverImage());
+        assertEquals(expected.get(1).getIsbn(), actual.get(1).getIsbn());
 
     }
 }
