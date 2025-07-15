@@ -102,7 +102,7 @@ public class BookControllerTest {
                 .setIsbn("4555")
                 .setPrice(BigDecimal.TEN)
                 .setCoverImage(COVER_IMAGE)
-                .setCategoryIds(List.of(1L, 2L));
+                .setCategoryIds(List.of(1L));
         BookDto expected = new BookDto()
                 .setId(4L)
                 .setTitle(requestDto.getTitle())
@@ -110,7 +110,7 @@ public class BookControllerTest {
                 .setIsbn(requestDto.getIsbn())
                 .setPrice(requestDto.getPrice())
                 .setCoverImage(requestDto.getCoverImage())
-                .setCategoryIds(List.of(1L, 2L));
+                .setCategoryIds(List.of(1L));
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
         MvcResult result = mockMvc.perform(post("/books")
