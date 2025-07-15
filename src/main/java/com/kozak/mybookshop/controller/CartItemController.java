@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,7 +43,7 @@ public class CartItemController {
     @PutMapping("/items/{id}")
     @PreAuthorize("hasRole('USER')")
     @Operation(summary = "Update certain item", description = "Update item in the cart by id")
-    public ShoppingCartDto updateCartItemQuantity( Authentication authentication,
+    public ShoppingCartDto updateCartItemQuantity(
             @PathVariable Long id,
             @Valid @RequestBody CartItemQuantityRequestDto requestDto) {
         return shoppingCartService.updateQuantityById(id,requestDto);

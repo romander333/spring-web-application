@@ -3,6 +3,7 @@ package com.kozak.mybookshop.dto.book;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 @Data

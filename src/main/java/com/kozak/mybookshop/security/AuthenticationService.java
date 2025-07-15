@@ -2,7 +2,9 @@ package com.kozak.mybookshop.security;
 
 import com.kozak.mybookshop.dto.user.UserLoginRequestDto;
 import com.kozak.mybookshop.dto.user.UserLoginResponseDto;
+import com.kozak.mybookshop.exception.EntityNotFoundException;
 import com.kozak.mybookshop.model.User;
+import com.kozak.mybookshop.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +18,8 @@ public class AuthenticationService {
     private final JwtUtil jwtUtil;
 
     private final AuthenticationManager authenticationManager;
+
+    private final UserRepository userRepository;
 
     public UserLoginResponseDto authenticate(UserLoginRequestDto userLoginRequestDto) {
         final Authentication authentication = authenticationManager.authenticate(
@@ -32,6 +36,8 @@ public class AuthenticationService {
             throw new RuntimeException("User is not authenticated");
         }
 
-        return (User) authentication.getPrincipal();
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User not found by email: " + email));
     }
 }

@@ -34,8 +34,7 @@ import static com.kozak.mybookshop.util.CartItemDataTest.sampleCartItemDto;
 import static com.kozak.mybookshop.util.ShoppingCartDataTest.sampleShoppingCart;
 import static com.kozak.mybookshop.util.ShoppingCartDataTest.sampleShoppingCartDto;
 import static com.kozak.mybookshop.util.UserDataTest.sampleUser;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -134,6 +133,22 @@ public class ShoppingCartServiceTest {
 
     }
 
+    @Test
+    void deleteAllCartItems_WithGivenCatalog_ShouldReturnEmptyCartItems() {
+        Long id = 3L;
+        User user = sampleUser(id);
+        CartItem cartItem = new CartItem();
+        cartItem.setId(id);
+        cartItem.setQuantity(5);
+        Set<CartItem> cartItems = new HashSet<>();
+        cartItems.add(cartItem);
+        ShoppingCart shoppingCart = sampleShoppingCart(user);
+        shoppingCart.setCartItems(cartItems);
+
+        shoppingCartService.deleteAllCartItems(shoppingCart);
+
+        assertTrue(shoppingCart.getCartItems().isEmpty());
+    }
 
     @Test
     @DisplayName("Delete cart item when valid id provided")
@@ -156,6 +171,7 @@ public class ShoppingCartServiceTest {
     }
 
     @Test
+    @DisplayName("Add cart item when valid cart item request provided")
     void addCartItem_WithValidCartItem_ShouldReturnShoppingCartDto() {
         Long id = 1L;
         User user = sampleUser(id);
@@ -193,6 +209,7 @@ public class ShoppingCartServiceTest {
     }
 
     @Test
+    @DisplayName("Get Shopping Cart when valid user provided")
     void getShoppingCart_WithValidUser_ShouldReturnShoppingCartDto() {
         Long id = 1L;
         User user = sampleUser(id);

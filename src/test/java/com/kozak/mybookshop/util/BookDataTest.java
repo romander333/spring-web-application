@@ -5,6 +5,10 @@ import com.kozak.mybookshop.dto.book.BookDtoWithoutCategoryIds;
 import com.kozak.mybookshop.dto.book.CreateBookRequestDto;
 import com.kozak.mybookshop.model.Book;
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class BookDataTest {
     private static final String COVER_IMAGE =
@@ -39,7 +43,8 @@ public class BookDataTest {
                 .setAuthor("Roman")
                 .setIsbn("333")
                 .setPrice(BigDecimal.valueOf(95.99))
-                .setCoverImage(COVER_IMAGE);
+                .setCoverImage(COVER_IMAGE)
+                .setCategoryIds(List.of());
     }
 
     public static CreateBookRequestDto sampleCreateBookRequestDto() {

@@ -3,6 +3,7 @@ package com.kozak.mybookshop.controller;
 import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryRequestDto;
 import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryResponseDto;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -125,8 +126,7 @@ public class CategoryControllerTest {
         CategoryResponseDto actual =
                 objectMapper.readValue(result.getResponse().getContentAsString(),
                         CategoryResponseDto.class);
-        Assertions.assertTrue(EqualsBuilder.reflectionEquals(actual,expected));
-
+        assertEquals(expected, actual);
     }
 
     @WithMockUser(username = "user", roles = "USER")
@@ -147,8 +147,8 @@ public class CategoryControllerTest {
         JsonNode node = jsonNode.get("content");
         CategoryResponseDto[] actual = objectMapper.treeToValue(node,CategoryResponseDto[].class);
         assertEquals(expected.size(), actual.length);
-        assertEquals(expected.get(0).name(), actual[0].name());
-        assertEquals(expected.get(1).description(), actual[1].description());
+        assertEquals(expected.get(0), actual[0]);
+        assertEquals(expected.get(1), actual[1]);
     }
 
     @WithMockUser(username = "user", roles = "USER")
@@ -166,8 +166,7 @@ public class CategoryControllerTest {
         CategoryResponseDto actual =
                 objectMapper.readValue(result.getResponse().getContentAsString(),
                         CategoryResponseDto.class);
-        assertEquals(expected.name(), actual.name());
-        assertEquals(expected.description(), actual.description());
+        assertEquals(expected, actual);
     }
 
     @WithMockUser(username = "admin", roles = "ADMIN")
@@ -188,8 +187,7 @@ public class CategoryControllerTest {
         CategoryResponseDto actual =
                 objectMapper.readValue(
                         result.getResponse().getContentAsString(), CategoryResponseDto.class);
-        assertEquals(expected.name(), actual.name());
-        assertEquals(expected.description(), actual.description());
+        assertEquals(expected, actual);
     }
 
     @WithMockUser(username = "admin", roles = "ADMIN")
@@ -215,7 +213,6 @@ public class CategoryControllerTest {
                         .setAuthor("Andrew")
                         .setIsbn("3323")
                         .setPrice(BigDecimal.valueOf(150))
-                        .setDescription("nice book for old people")
                         .setCoverImage(COVER_IMAGE),
                 new BookDtoWithoutCategoryIds()
                         .setId(3L)
@@ -223,7 +220,6 @@ public class CategoryControllerTest {
                         .setAuthor("Katerina")
                         .setIsbn("3313")
                         .setPrice(BigDecimal.valueOf(300))
-                        .setDescription("nice book for old people")
                         .setCoverImage(COVER_IMAGE)
         );
 
@@ -236,10 +232,17 @@ public class CategoryControllerTest {
                 objectMapper.readValue(
                         result.getResponse().getContentAsString(), new TypeReference<>() {});
         assertEquals(expected.size(), actual.size());
-        assertEquals(expected.get(0).getTitle(), actual.get(0).getTitle());
-        assertEquals(expected.get(0).getIsbn(), actual.get(0).getIsbn());
-        assertEquals(expected.get(1).getAuthor(), actual.get(1).getAuthor());
-        assertEquals(expected.get(1).getCoverImage(), actual.get(1).getCoverImage());
+        for (int i = 0; i < expected.size(); i++) {
+            BookDtoWithoutCategoryIds expectedDto = expected.get(i);
+            BookDtoWithoutCategoryIds actualDto = actual.get(i);
 
+            assertEquals(expectedDto.getId(), actualDto.getId());
+            assertEquals(expectedDto.getTitle(), actualDto.getTitle());
+            assertEquals(expectedDto.getAuthor(), actualDto.getAuthor());
+            assertEquals(expectedDto.getIsbn(), actualDto.getIsbn());
+            assertEquals(expectedDto.getCoverImage(), actualDto.getCoverImage());
+
+            assertEquals(0, expectedDto.getPrice().compareTo(actualDto.getPrice()));
+        }
     }
 }
