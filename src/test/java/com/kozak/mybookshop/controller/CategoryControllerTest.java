@@ -199,6 +199,9 @@ public class CategoryControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andReturn();
+        mockMvc.perform(get("/categories/{id}", categoryId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @WithMockUser(username = "user", roles = "USER")

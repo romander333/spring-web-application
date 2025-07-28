@@ -14,12 +14,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {
-    @Value("${jwt.expiration}")
-    private long expiration;
-    private Key secret;
+    private final long expiration;
+    private final Key secret;
 
-    public JwtUtil(@Value("${jwt.secret}") String secretString) {
+    public JwtUtil(@Value("${jwt.secret}") String secretString,
+                   @Value("${jwt.expiration}") long expiration) {
         secret = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
+        this.expiration = expiration;
     }
 
     public String generateToken(String username) {
