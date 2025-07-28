@@ -2,7 +2,6 @@ package com.kozak.mybookshop.controller;
 
 import static com.kozak.mybookshop.util.BookDataTest.sampleBookDto;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -121,7 +120,6 @@ public class BookControllerTest {
 
         BookDto actual = objectMapper.readValue(result.getResponse().getContentAsString(),
                 BookDto.class);
-        assertNotNull(actual.getId());
         assertEquals(expected, actual);
     }
 
@@ -184,15 +182,18 @@ public class BookControllerTest {
         assertEquals(expected, actual);
     }
 
-    @WithMockUser(username = "admin", roles = "ADMIN")
+    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
     @DisplayName("Should return NoContent status when valid book id is provided")
     @Test
     void deleteBookById_WithValidId_ShouldReturnCorrectStatus() throws Exception {
         Long bookId = 1L;
         mockMvc.perform(delete("/books/{id}", bookId)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent())
-                .andReturn();
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/books/{id}", bookId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @WithMockUser(username = "admin", roles = "ADMIN")

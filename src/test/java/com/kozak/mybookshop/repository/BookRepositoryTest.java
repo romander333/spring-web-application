@@ -1,12 +1,16 @@
 package com.kozak.mybookshop.repository;
 
+import static com.kozak.mybookshop.util.BookDataTest.sampleBook;
+import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategory;
 import static org.junit.Assert.assertEquals;
 
 import com.kozak.mybookshop.model.Book;
+import com.kozak.mybookshop.model.Category;
 import com.kozak.mybookshop.repository.book.BookRepository;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +58,11 @@ public class BookRepositoryTest {
     @Test
     @DisplayName("find books when valid category id provided")
     void findByCategoriesId_WithValidCategoriesId_ReturnBooks() {
+        Book expected = sampleBook();
+        Category category = sampleCategory();
+        expected.setCategories(Set.of(category));
         List<Book> actual = bookRepository.findByCategories_Id(1L);
         assertEquals(1, actual.size());
+        assertEquals(expected, actual.get(0));
     }
 }

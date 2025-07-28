@@ -4,7 +4,6 @@ import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategory;
 import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryRequestDto;
 import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryResponseDto;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,21 +49,22 @@ public class CategoryServiceTest {
         category.setName("fantastic");
         category.setDescription("about not real situation");
 
-        CategoryResponseDto dto1 = sampleCategoryResponseDto();
-        CategoryResponseDto dto2 =
+        CategoryResponseDto expected = sampleCategoryResponseDto();
+        CategoryResponseDto expected2 =
                 new CategoryResponseDto(2L,"fantastic", "about not real situation");
 
         Page<Category> categoryPage = new PageImpl<>(Arrays.asList(category, category2));
         Pageable pageable = PageRequest.of(0, 10);
 
-        when(categoryMapper.toDto(category)).thenReturn(dto1);
-        when(categoryMapper.toDto(category2)).thenReturn(dto2);
+        when(categoryMapper.toDto(category)).thenReturn(expected);
+        when(categoryMapper.toDto(category2)).thenReturn(expected2);
         when(categoryRepository.findAll(pageable)).thenReturn(categoryPage);
 
         Page<CategoryResponseDto> actual = categoryService.findAll(pageable);
         assertEquals(2, actual.getContent().size());
-        assertEquals(dto1.name(), actual.getContent().get(0).name());
-        assertEquals(dto2.name(), actual.getContent().get(1).name());
+        assertEquals(expected, actual.getContent().get(0));
+        assertEquals(expected2, actual.getContent().get(1));
+        verify(categoryRepository).findAll(pageable);
     }
 
     @Test
@@ -74,18 +74,15 @@ public class CategoryServiceTest {
         Category savedCategory = sampleCategory();
 
         CategoryRequestDto requestDto = sampleCategoryRequestDto();
-        CategoryResponseDto dto = sampleCategoryResponseDto();
+        CategoryResponseDto expected = sampleCategoryResponseDto();
 
         when(categoryMapper.toEntity(requestDto)).thenReturn(category);
-        when(categoryMapper.toDto(savedCategory)).thenReturn(dto);
+        when(categoryMapper.toDto(savedCategory)).thenReturn(expected);
         when(categoryRepository.save(category)).thenReturn(savedCategory);
 
         CategoryResponseDto actual = categoryService.save(requestDto);
+        assertEquals(expected, actual);
         verify(categoryRepository).save(category);
-        assertNotNull(actual);
-        assertEquals(actual.name(), category.getName());
-        assertEquals(actual.id(), savedCategory.getId());
-        assertEquals(actual.description(), savedCategory.getDescription());
     }
 
     @Test
@@ -94,16 +91,14 @@ public class CategoryServiceTest {
         Long categoryId = 1L;
         Category category = sampleCategory();
 
-        CategoryResponseDto dto = sampleCategoryResponseDto();
+        CategoryResponseDto expected = sampleCategoryResponseDto();
 
-        when(categoryMapper.toDto(category)).thenReturn(dto);
+        when(categoryMapper.toDto(category)).thenReturn(expected);
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
         CategoryResponseDto actual = categoryService.getById(categoryId);
+        assertEquals(expected, actual);
         verify(categoryRepository).findById(categoryId);
-        assertEquals(actual.name(), category.getName());
-        assertEquals(actual.id(), category.getId());
-        assertEquals(actual.description(), category.getDescription());
     }
 
     @Test

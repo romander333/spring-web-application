@@ -8,7 +8,6 @@ import static com.kozak.mybookshop.util.BookDataTest.sampleBookDtoWithoutCategor
 import static com.kozak.mybookshop.util.BookDataTest.sampleCreateBookRequestDto;
 import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategory;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,7 +20,6 @@ import com.kozak.mybookshop.model.Book;
 import com.kozak.mybookshop.model.Category;
 import com.kozak.mybookshop.repository.book.BookRepository;
 import com.kozak.mybookshop.service.book.BookServiceImpl;
-import com.kozak.mybookshop.util.BookDataTest;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -47,9 +45,6 @@ public class BookServiceTest {
     @Mock
     private BookMapper bookMapper;
 
-    @Mock
-    private BookDataTest testUtil;
-
     @InjectMocks
     private BookServiceImpl bookService;
 
@@ -66,10 +61,8 @@ public class BookServiceTest {
 
         BookDto actual = bookService.getById(bookId);
 
+        assertEquals(expected, actual);
         verify(bookRepository).findById(bookId);
-        assertEquals(expected.getTitle(), actual.getTitle());
-        assertEquals(expected.getAuthor(), actual.getAuthor());
-        assertEquals(expected.getIsbn(), actual.getIsbn());
     }
 
     @Test
@@ -94,31 +87,26 @@ public class BookServiceTest {
         Set<Category> categories = new HashSet<>();
         categories.add(category);
 
-        Book expected1 = sampleBook();
-        expected1.setCategories(categories);
-        Book expected2 = anotherSampleBook();
-        expected2.setCategories(categories);
+        Book book = sampleBook();
+        book.setCategories(categories);
+        Book book2 = anotherSampleBook();
+        book2.setCategories(categories);
         Long categoryId = 1L;
 
-        BookDtoWithoutCategoryIds dto1 = sampleBookDtoWithoutCategoryIds();
-        BookDtoWithoutCategoryIds dto2 = anotherSampleBookDtoWithoutCategoryIds();
+        BookDtoWithoutCategoryIds expected1 = sampleBookDtoWithoutCategoryIds();
+        BookDtoWithoutCategoryIds expected2 = anotherSampleBookDtoWithoutCategoryIds();
 
-        when(bookMapper.toDtoWithoutCategories(expected1)).thenReturn(dto1);
-        when(bookMapper.toDtoWithoutCategories(expected2)).thenReturn(dto2);
+        when(bookMapper.toDtoWithoutCategories(book)).thenReturn(expected1);
+        when(bookMapper.toDtoWithoutCategories(book2)).thenReturn(expected2);
         when(bookRepository.findByCategories_Id(categoryId))
-                .thenReturn(List.of(expected1, expected2));
+                .thenReturn(List.of(book, book2));
         List<BookDtoWithoutCategoryIds> actual = bookService.getBooksByCategoryId(categoryId);
 
-        verify(bookRepository).findByCategories_Id(categoryId);
         assertEquals(2, actual.size());
-        assertEquals(expected1.getTitle(), actual.get(0).getTitle());
-        assertEquals(expected1.getAuthor(), actual.get(0).getAuthor());
-        assertEquals(expected1.getIsbn(), actual.get(0).getIsbn());
-        assertEquals(expected1.getCoverImage(), actual.get(0).getCoverImage());
-        assertEquals(expected2.getTitle(), actual.get(1).getTitle());
-        assertEquals(expected2.getAuthor(), actual.get(1).getAuthor());
-        assertEquals(expected2.getIsbn(), actual.get(1).getIsbn());
-        assertEquals(expected2.getCoverImage(), actual.get(1).getCoverImage());
+        assertEquals(expected1, actual.get(0));
+        assertEquals(expected2, actual.get(1));
+        verify(bookRepository).findByCategories_Id(categoryId);
+
     }
 
     @Test
@@ -126,19 +114,17 @@ public class BookServiceTest {
     void save_WithValidBook_ShouldSaveAndReturnBookDto() {
         Book book = sampleBook();
         Book savedBook = sampleBook();
-        BookDto bookDto = sampleBookDto();
+        BookDto expected = sampleBookDto();
         CreateBookRequestDto createBookRequestDto = sampleCreateBookRequestDto();
 
-        when(bookMapper.toBookDto(savedBook)).thenReturn(bookDto);
+        when(bookMapper.toBookDto(savedBook)).thenReturn(expected);
         when(bookMapper.toModel(createBookRequestDto)).thenReturn(book);
         when(bookRepository.save(book)).thenReturn(savedBook);
 
         BookDto actual = bookService.save(createBookRequestDto);
+
+        assertEquals(expected, actual);
         verify(bookRepository).save(book);
-        assertNotNull(actual);
-        assertEquals(createBookRequestDto.getTitle(), actual.getTitle());
-        assertEquals(createBookRequestDto.getAuthor(), actual.getAuthor());
-        assertEquals(createBookRequestDto.getIsbn(), actual.getIsbn());
 
     }
 
@@ -153,28 +139,22 @@ public class BookServiceTest {
     @Test
     @DisplayName("find all books")
     void findAll_WithValidPageable_ReturnPageOfBookDtos() {
-        Book expected1 = sampleBook();
-        Book expected2 = anotherSampleBook();
+        Book book = sampleBook();
+        Book book2 = anotherSampleBook();
 
-        BookDtoWithoutCategoryIds dto1 = sampleBookDtoWithoutCategoryIds();
-        BookDtoWithoutCategoryIds dto2 = anotherSampleBookDtoWithoutCategoryIds();
+        BookDtoWithoutCategoryIds expected1 = sampleBookDtoWithoutCategoryIds();
+        BookDtoWithoutCategoryIds expected2 = anotherSampleBookDtoWithoutCategoryIds();
 
-        Page<Book> bookPage = new PageImpl<>(List.of(expected1, expected2));
+        Page<Book> bookPage = new PageImpl<>(List.of(book, book2));
         Pageable pageable = PageRequest.of(0, 10);
-        when(bookMapper.toDtoWithoutCategories(expected1)).thenReturn(dto1);
-        when(bookMapper.toDtoWithoutCategories(expected2)).thenReturn(dto2);
+        when(bookMapper.toDtoWithoutCategories(book)).thenReturn(expected1);
+        when(bookMapper.toDtoWithoutCategories(book2)).thenReturn(expected2);
         when(bookRepository.findAll(pageable)).thenReturn(bookPage);
 
         Page<BookDtoWithoutCategoryIds> actual = bookService.findAll(pageable);
         assertEquals(2, actual.getContent().size());
-        assertEquals(expected1.getTitle(), actual.getContent().get(0).getTitle());
-        assertEquals(expected1.getAuthor(), actual.getContent().get(0).getAuthor());
-        assertEquals(expected1.getIsbn(), actual.getContent().get(0).getIsbn());
-        assertEquals(expected1.getCoverImage(), actual.getContent().get(0).getCoverImage());
-        assertEquals(expected2.getTitle(), actual.getContent().get(1).getTitle());
-        assertEquals(expected2.getAuthor(), actual.getContent().get(1).getAuthor());
-        assertEquals(expected2.getIsbn(), actual.getContent().get(1).getIsbn());
-        assertEquals(expected2.getCoverImage(), actual.getContent().get(1).getCoverImage());
+        assertEquals(expected1, actual.getContent().get(0));
+        assertEquals(expected2, actual.getContent().get(1));
     }
 
     @Test

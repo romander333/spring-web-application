@@ -187,7 +187,7 @@ public class CategoryControllerTest {
         assertEquals(expected, actual);
     }
 
-    @WithMockUser(username = "admin", roles = "ADMIN")
+    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
     @DisplayName("Should return NoContent status when valid category id is provided")
     @Test
     void deleteCategory_WithValidId_ShouldReturnNoContentStatus() throws Exception {
@@ -196,6 +196,10 @@ public class CategoryControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andReturn();
+
+        mockMvc.perform(get("/categories/{id}", categoryId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @WithMockUser(username = "user", roles = "USER")
@@ -209,14 +213,14 @@ public class CategoryControllerTest {
                         .setTitle("Super_man")
                         .setAuthor("Andrew")
                         .setIsbn("3323")
-                        .setPrice(BigDecimal.valueOf(150))
+                        .setPrice(BigDecimal.valueOf(150).setScale(2, BigDecimal.ROUND_HALF_UP))
                         .setCoverImage(COVER_IMAGE),
                 new BookDtoWithoutCategoryIds()
                         .setId(3L)
                         .setTitle("Older_man_in_sea")
                         .setAuthor("Katerina")
                         .setIsbn("3313")
-                        .setPrice(BigDecimal.valueOf(300))
+                        .setPrice(BigDecimal.valueOf(300).setScale(2, BigDecimal.ROUND_HALF_UP))
                         .setCoverImage(COVER_IMAGE)
         );
 
@@ -230,16 +234,7 @@ public class CategoryControllerTest {
                         result.getResponse().getContentAsString(), new TypeReference<>() {});
         assertEquals(expected.size(), actual.size());
         for (int i = 0; i < expected.size(); i++) {
-            BookDtoWithoutCategoryIds expectedDto = expected.get(i);
-            BookDtoWithoutCategoryIds actualDto = actual.get(i);
-
-            assertEquals(expectedDto.getId(), actualDto.getId());
-            assertEquals(expectedDto.getTitle(), actualDto.getTitle());
-            assertEquals(expectedDto.getAuthor(), actualDto.getAuthor());
-            assertEquals(expectedDto.getIsbn(), actualDto.getIsbn());
-            assertEquals(expectedDto.getCoverImage(), actualDto.getCoverImage());
-
-            assertEquals(0, expectedDto.getPrice().compareTo(actualDto.getPrice()));
+            assertEquals(expected.get(i), actual.get(i));
         }
     }
 }
