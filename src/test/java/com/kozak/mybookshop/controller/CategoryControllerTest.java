@@ -1,5 +1,6 @@
 package com.kozak.mybookshop.controller;
 
+import static com.kozak.mybookshop.util.BookDataTest.sampleBookDtoWithoutCategoryIdsList;
 import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryRequestDto;
 import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryResponseDto;
 import static org.junit.Assert.assertEquals;
@@ -16,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kozak.mybookshop.dto.book.BookDtoWithoutCategoryIds;
 import com.kozak.mybookshop.dto.category.CategoryRequestDto;
 import com.kozak.mybookshop.dto.category.CategoryResponseDto;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -207,22 +207,7 @@ public class CategoryControllerTest {
     @Test
     void getBooksByCategory_WithValidId_ShouldReturnAllBooks() throws Exception {
         Long categoryId = 2L;
-        List<BookDtoWithoutCategoryIds> expected = List.of(
-                new BookDtoWithoutCategoryIds()
-                        .setId(2L)
-                        .setTitle("Super_man")
-                        .setAuthor("Andrew")
-                        .setIsbn("3323")
-                        .setPrice(BigDecimal.valueOf(150).setScale(2, BigDecimal.ROUND_HALF_UP))
-                        .setCoverImage(COVER_IMAGE),
-                new BookDtoWithoutCategoryIds()
-                        .setId(3L)
-                        .setTitle("Older_man_in_sea")
-                        .setAuthor("Katerina")
-                        .setIsbn("3313")
-                        .setPrice(BigDecimal.valueOf(300).setScale(2, BigDecimal.ROUND_HALF_UP))
-                        .setCoverImage(COVER_IMAGE)
-        );
+        List<BookDtoWithoutCategoryIds> expected = sampleBookDtoWithoutCategoryIdsList();
 
         MvcResult result = mockMvc.perform(get("/categories/{id}/books", categoryId)
                         .contentType(MediaType.APPLICATION_JSON))

@@ -1,6 +1,9 @@
 package com.kozak.mybookshop.controller;
 
 import static com.kozak.mybookshop.util.BookDataTest.sampleBookDto;
+import static com.kozak.mybookshop.util.BookDataTest.sampleBookDtoForUpdateOrCreate;
+import static com.kozak.mybookshop.util.BookDataTest.sampleBookDtoList;
+import static com.kozak.mybookshop.util.BookDataTest.sampleCreateBookRequestDtoForCreateBookOrUpdate;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -14,7 +17,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kozak.mybookshop.dto.book.BookDto;
 import com.kozak.mybookshop.dto.book.CreateBookRequestDto;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -95,21 +97,8 @@ public class BookControllerTest {
     @Test
     @DisplayName("Create a new book when valid request provide")
     void createBook_WithValidRequest_Success() throws Exception {
-        CreateBookRequestDto requestDto = new CreateBookRequestDto()
-                .setTitle("Black_man")
-                .setAuthor("Kozak")
-                .setIsbn("4555")
-                .setPrice(BigDecimal.TEN)
-                .setCoverImage(COVER_IMAGE)
-                .setCategoryIds(List.of(1L));
-        BookDto expected = new BookDto()
-                .setId(4L)
-                .setTitle(requestDto.getTitle())
-                .setAuthor(requestDto.getAuthor())
-                .setIsbn(requestDto.getIsbn())
-                .setPrice(requestDto.getPrice())
-                .setCoverImage(requestDto.getCoverImage())
-                .setCategoryIds(List.of(1L));
+        CreateBookRequestDto requestDto = sampleCreateBookRequestDtoForCreateBookOrUpdate();
+        BookDto expected = sampleBookDtoForUpdateOrCreate();
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
         MvcResult result = mockMvc.perform(post("/books")
@@ -127,29 +116,7 @@ public class BookControllerTest {
     @DisplayName("Get all books")
     @Test
     void getAll_GivenBooksInCatalog_ShouldReturnAllBooks() throws Exception {
-        List<BookDto> expectedBooks = List.of(
-                new BookDto()
-                        .setId(1L)
-                        .setTitle("New_man")
-                        .setAuthor("Roman")
-                        .setIsbn("333")
-                        .setPrice(BigDecimal.valueOf(95.99))
-                        .setCoverImage(COVER_IMAGE),
-                new BookDto()
-                        .setId(2L)
-                        .setTitle("Super_man")
-                        .setAuthor("Andrew")
-                        .setIsbn("3323")
-                        .setPrice(BigDecimal.valueOf(150.0))
-                        .setCoverImage(COVER_IMAGE),
-                new BookDto()
-                        .setId(3L)
-                        .setTitle("Older_man_in_sea")
-                        .setAuthor("Katerina")
-                        .setIsbn("3313")
-                        .setPrice(BigDecimal.valueOf(300.0))
-                        .setCoverImage(COVER_IMAGE)
-        );
+        List<BookDto> expectedBooks = sampleBookDtoList();
         MvcResult result = mockMvc.perform(get("/books")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -200,23 +167,10 @@ public class BookControllerTest {
     @DisplayName("Update book when valid book id provided")
     @Test
     void updateBookById_WithValidId_ShouldUpdateBookDto() throws Exception {
-        Long bookId = 1L;
-        CreateBookRequestDto requestDto = new CreateBookRequestDto()
-                .setTitle("Bad_man")
-                .setAuthor("Eva")
-                .setIsbn("3455")
-                .setPrice(BigDecimal.valueOf(100))
-                .setCategoryIds(List.of(1L))
-                .setCoverImage(COVER_IMAGE);
-        BookDto expected = new BookDto()
-                .setId(bookId)
-                .setTitle(requestDto.getTitle())
-                .setAuthor(requestDto.getAuthor())
-                .setIsbn(requestDto.getIsbn())
-                .setPrice(requestDto.getPrice())
-                .setDescription(requestDto.getDescription())
-                .setCategoryIds(requestDto.getCategoryIds())
-                .setCoverImage(requestDto.getCoverImage());
+        Long bookId = 2L;
+        CreateBookRequestDto requestDto = sampleCreateBookRequestDtoForCreateBookOrUpdate();
+        BookDto expected = sampleBookDtoForUpdateOrCreate();
+        expected.setId(bookId);
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
         MvcResult result = mockMvc.perform(put("/books/{id}", bookId)
