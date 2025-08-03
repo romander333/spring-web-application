@@ -65,9 +65,9 @@ public class ShoppingCartServiceTest {
         Set<CartItemDto> cartItemDtos = new HashSet<>();
         cartItemDtos.add(cartItemDto);
 
-        User user = sampleUser(id);
+        User user = sampleUser();
 
-        ShoppingCart shoppingCart = sampleShoppingCart(user);
+        ShoppingCart shoppingCart = sampleShoppingCart();
 
         CartItem cartItem = sampleCartItem();
         cartItem.setShoppingCart(shoppingCart);
@@ -79,7 +79,7 @@ public class ShoppingCartServiceTest {
         ShoppingCartDto expected = sampleShoppingCartDto()
                 .setCartItems(cartItemDtos);
 
-        ShoppingCart savedShoppingCart = sampleShoppingCart(user);
+        ShoppingCart savedShoppingCart = sampleShoppingCart();
 
         Mockito.when(shoppingCartMapper.toDto(Mockito.any(ShoppingCart.class))).thenReturn(expected);
         Mockito.when(shoppingCartRepository.findShoppingCartByUser_Id(id)).thenReturn(Optional.of(shoppingCart));
@@ -88,20 +88,21 @@ public class ShoppingCartServiceTest {
 
         ShoppingCartDto actual = shoppingCartService.updateQuantityById(id, requestDto);
 
-        assertEquals(expected.getUserId(), actual.getUserId());
-        assertEquals(expected.getCartItems().size(), actual.getCartItems().size());
+        assertEquals(expected, actual);
 
     }
 
     @Test
+    @DisplayName("Update quantity books when invalid cart items provided")
     void updateQuantityById_WithInvalidCartItemId_ShouldThrowEntityNotFoundException() {
         Long id = 4L;
-        User user = sampleUser(1L);
-        ShoppingCart shoppingCart = sampleShoppingCart(user);
+        User user = sampleUser();
+        ShoppingCart shoppingCart = sampleShoppingCart();
         CartItemQuantityRequestDto requestDto = new CartItemQuantityRequestDto();
         requestDto.setQuantity(5);
 
-        Mockito.when(shoppingCartRepository.findShoppingCartByUser_Id(1L)).thenReturn(Optional.of(shoppingCart));
+        Mockito.when(shoppingCartRepository.findShoppingCartByUser_Id(1L))
+                .thenReturn(Optional.of(shoppingCart));
         Mockito.when(authenticationService.getCurrentUser()).thenReturn(user);
 
         Exception exception = Assertions.assertThrows(EntityNotFoundException.class, () ->
@@ -117,9 +118,9 @@ public class ShoppingCartServiceTest {
     @DisplayName("Create shopping Cart when valid request provided")
     void createShoppingCart_WithValidShoppingRequest_ShouldReturnShoppingCart() {
         Long id = 3L;
-        User user = sampleUser(id);
+        User user = sampleUser();
 
-        ShoppingCart savedShoppingCart = sampleShoppingCart(user);
+        ShoppingCart savedShoppingCart = sampleShoppingCart();
 
         ShoppingCartDto expected = new ShoppingCartDto()
                 .setId(id)
@@ -129,20 +130,20 @@ public class ShoppingCartServiceTest {
         Mockito.when(shoppingCartRepository.save(Mockito.any(ShoppingCart.class))).thenReturn(savedShoppingCart);
 
         ShoppingCartDto actual = shoppingCartService.createShoppingCart(user);
-        assertTrue(EqualsBuilder.reflectionEquals(expected, actual));
+        assertEquals(expected, actual);
 
     }
 
     @Test
+    @DisplayName("Delete all cart items in given catalog")
     void deleteAllCartItems_WithGivenCatalog_ShouldReturnEmptyCartItems() {
         Long id = 3L;
-        User user = sampleUser(id);
         CartItem cartItem = new CartItem();
         cartItem.setId(id);
         cartItem.setQuantity(5);
         Set<CartItem> cartItems = new HashSet<>();
         cartItems.add(cartItem);
-        ShoppingCart shoppingCart = sampleShoppingCart(user);
+        ShoppingCart shoppingCart = sampleShoppingCart();
         shoppingCart.setCartItems(cartItems);
 
         shoppingCartService.deleteAllCartItems(shoppingCart);
@@ -153,14 +154,14 @@ public class ShoppingCartServiceTest {
     @Test
     @DisplayName("Delete cart item when valid id provided")
     void deleteCartItem_WithValidId_ShouldDeleteShoppingCart() {
-        Long id = 3L;
-        User user = sampleUser(id);
+        Long id = 1L;
+        User user = sampleUser();
         CartItem cartItem = new CartItem();
         cartItem.setId(id);
         cartItem.setQuantity(5);
         Set<CartItem> cartItems = new HashSet<>();
         cartItems.add(cartItem);
-        ShoppingCart shoppingCart = sampleShoppingCart(user);
+        ShoppingCart shoppingCart = sampleShoppingCart();
         shoppingCart.setCartItems(cartItems);
 
         Mockito.when(authenticationService.getCurrentUser()).thenReturn(user);
@@ -174,16 +175,14 @@ public class ShoppingCartServiceTest {
     @DisplayName("Add cart item when valid cart item request provided")
     void addCartItem_WithValidCartItem_ShouldReturnShoppingCartDto() {
         Long id = 1L;
-        User user = sampleUser(id);
-
+        User user = sampleUser();
         Book book = sampleBook();
-
         CartItem cartItem = sampleCartItem();
         cartItem.setBook(book);
 
         CartItemDto cartItemDto = sampleCartItemDto();
 
-        ShoppingCart shoppingCart = sampleShoppingCart(user);
+        ShoppingCart shoppingCart = sampleShoppingCart();
         shoppingCart.setCartItems(new HashSet<>());
 
         CreateCartItemRequestDto requestDto = new CreateCartItemRequestDto();
@@ -191,7 +190,7 @@ public class ShoppingCartServiceTest {
         requestDto.setBookId(id);
 
         shoppingCart.getCartItems().add(cartItem);
-        ShoppingCart savedShoppingCart = sampleShoppingCart(user);
+        ShoppingCart savedShoppingCart = sampleShoppingCart();
         savedShoppingCart.setCartItems(Set.of(cartItem));
 
         ShoppingCartDto expected = sampleShoppingCartDto()
@@ -205,15 +204,15 @@ public class ShoppingCartServiceTest {
 
         ShoppingCartDto actual = shoppingCartService.addCartItem(requestDto);
 
-        assertTrue(EqualsBuilder.reflectionEquals(expected, actual));
+        assertEquals(expected, actual);
     }
 
     @Test
     @DisplayName("Get Shopping Cart when valid user provided")
     void getShoppingCart_WithValidUser_ShouldReturnShoppingCartDto() {
         Long id = 1L;
-        User user = sampleUser(id);
-        ShoppingCart shoppingCart = sampleShoppingCart(user);
+        User user = sampleUser();
+        ShoppingCart shoppingCart = sampleShoppingCart();
         ShoppingCartDto expected = sampleShoppingCartDto();
 
         Mockito.when(authenticationService.getCurrentUser()).thenReturn(user);
@@ -222,6 +221,6 @@ public class ShoppingCartServiceTest {
 
         ShoppingCartDto actual = shoppingCartService.getShoppingCart();
 
-        Assertions.assertTrue(EqualsBuilder.reflectionEquals(expected, actual));
+        assertEquals(expected, actual);
     }
 }

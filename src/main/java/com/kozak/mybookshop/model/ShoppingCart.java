@@ -11,12 +11,17 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
+
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 @Table(name = "shopping_carts")
 public class ShoppingCart {
     @Id

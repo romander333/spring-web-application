@@ -6,7 +6,6 @@ import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryResponseD
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.kozak.mybookshop.dto.category.CategoryRequestDto;
 import com.kozak.mybookshop.dto.category.CategoryResponseDto;
@@ -58,9 +57,9 @@ public class CategoryServiceTest {
         Page<Category> categoryPage = new PageImpl<>(Arrays.asList(category, category2));
         Pageable pageable = PageRequest.of(0, 10);
 
-        when(categoryMapper.toDto(category)).thenReturn(dto1);
-        when(categoryMapper.toDto(category2)).thenReturn(dto2);
-        when(categoryRepository.findAll(pageable)).thenReturn(categoryPage);
+        Mockito.when(categoryMapper.toDto(category)).thenReturn(dto1);
+        Mockito.when(categoryMapper.toDto(category2)).thenReturn(dto2);
+        Mockito.when(categoryRepository.findAll(pageable)).thenReturn(categoryPage);
 
         Page<CategoryResponseDto> actual = categoryService.findAll(pageable);
         assertEquals(2, actual.getContent().size());
@@ -77,9 +76,9 @@ public class CategoryServiceTest {
         CategoryRequestDto requestDto = sampleCategoryRequestDto();
         CategoryResponseDto dto = sampleCategoryResponseDto();
 
-        when(categoryMapper.toEntity(requestDto)).thenReturn(category);
-        when(categoryMapper.toDto(savedCategory)).thenReturn(dto);
-        when(categoryRepository.save(category)).thenReturn(savedCategory);
+        Mockito.when(categoryMapper.toEntity(requestDto)).thenReturn(category);
+        Mockito.when(categoryMapper.toDto(savedCategory)).thenReturn(dto);
+        Mockito.when(categoryRepository.save(category)).thenReturn(savedCategory);
 
         CategoryResponseDto actual = categoryService.save(requestDto);
         verify(categoryRepository).save(category);
@@ -97,8 +96,8 @@ public class CategoryServiceTest {
 
         CategoryResponseDto dto = sampleCategoryResponseDto();
 
-        when(categoryMapper.toDto(category)).thenReturn(dto);
-        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+        Mockito.when(categoryMapper.toDto(category)).thenReturn(dto);
+        Mockito.when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
         CategoryResponseDto actual = categoryService.getById(categoryId);
         verify(categoryRepository).findById(categoryId);
@@ -112,7 +111,7 @@ public class CategoryServiceTest {
     void getById_WithInValidCategoryId_ShouldThrownEntityNotFoundException() {
         Long categoryId = -100L;
 
-        when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+        Mockito.when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
         Exception exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
             categoryService.getById(categoryId);
         });
@@ -135,7 +134,7 @@ public class CategoryServiceTest {
         Long categoryId = -100L;
         CategoryRequestDto requestDto = sampleCategoryRequestDto();
 
-        when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+        Mockito.when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
         Exception exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
             categoryService.update(categoryId,requestDto);
         });

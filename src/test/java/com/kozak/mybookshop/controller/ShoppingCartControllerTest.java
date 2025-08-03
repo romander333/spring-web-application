@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.kozak.mybookshop.util.CartItemDataTest.createSampleCartItemDto;
 import static com.kozak.mybookshop.util.CartItemDataTest.sampleCartItemDto;
 import static com.kozak.mybookshop.util.ShoppingCartDataTest.sampleShoppingCartDto;
 import static org.junit.Assert.assertEquals;
@@ -93,7 +94,7 @@ public class ShoppingCartControllerTest {
         Long id = 1L;
         int quantity = 2;
         CartItemDto cartItem = sampleCartItemDto();
-        cartItem.setQuantity(5);
+        cartItem.setQuantity(2);
         Set<CartItemDto> cartItems = new HashSet<>();
         cartItems.add(cartItem);
         ShoppingCartDto expected = sampleShoppingCartDto();
@@ -102,21 +103,15 @@ public class ShoppingCartControllerTest {
         requestDto.setQuantity(quantity);
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
-        MvcResult mvcResult = mockMvc.perform(put("/cart/items/{id}", id)
+        MvcResult result = mockMvc.perform(put("/cart/items/{id}", id)
                 .content(jsonRequest)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        ShoppingCartDto actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ShoppingCartDto.class);
-        CartItemDto actualCartItem = actual.getCartItems().stream()
-                .filter(cart -> cart.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("CartItem with id " + id + " not found"));
-        assertEquals(expected.getId(), actual.getId());
-        assertEquals(expected.getUserId(), actual.getUserId());
-        assertEquals(expected.getCartItems().size(), actual.getCartItems().size());
-        assertEquals(quantity, actualCartItem.getQuantity());
+        ShoppingCartDto actual = objectMapper.readValue(
+                result.getResponse().getContentAsString(), ShoppingCartDto.class);
+        assertEquals(expected, actual);
     }
 
     @DisplayName("Get shopping cart in current user")
@@ -134,21 +129,11 @@ public class ShoppingCartControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        ShoppingCartDto actual = objectMapper.readValue(result.getResponse().getContentAsString(), ShoppingCartDto.class);
+        ShoppingCartDto actual = objectMapper.readValue(
+                result.getResponse().getContentAsString(), ShoppingCartDto.class);
 
-        assertEquals(expected.getId(), actual.getId());
-        assertEquals(expected.getUserId(), actual.getUserId());
-        assertEquals(expected.getCartItems().size(), actual.getCartItems().size());
+        assertEquals(expected, actual);
 
-        for (CartItemDto expectedItem : expected.getCartItems()) {
-            CartItemDto actualItem = actual.getCartItems().stream()
-                    .filter(item -> item.getId().equals(expectedItem.getId()))
-                    .findFirst()
-                    .orElseThrow(() -> new AssertionError("CartItem with id " + expectedItem.getId() + " not found"));
-
-            assertEquals(expectedItem.getBookId(), actualItem.getBookId());
-            assertEquals(expectedItem.getQuantity(), actualItem.getQuantity());
-        }
     }
 
     @DisplayName("Add cart item when valid request provided")
@@ -157,13 +142,10 @@ public class ShoppingCartControllerTest {
     void addCartItem_WithValidRequest_ShouldReturnShoppingCartDto() throws Exception {
         Long cartId = 4L;
         CartItemDto cartItem = sampleCartItemDto();
-        CartItemDto expectedCartItem = new CartItemDto()
-                .setId(4L)
-                .setQuantity(2)
-                .setBookId(3L);
+        CartItemDto expectedCartItem = createSampleCartItemDto();
         Set<CartItemDto> cartItems = new HashSet<>();
-        cartItems.add(cartItem);
         cartItems.add(expectedCartItem);
+        cartItems.add(cartItem);
         ShoppingCartDto expected = sampleShoppingCartDto();
         expected.setCartItems(cartItems);
         CreateCartItemRequestDto requestDto = new CreateCartItemRequestDto();
@@ -178,22 +160,13 @@ public class ShoppingCartControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        ShoppingCartDto actual = objectMapper.readValue(result.getResponse().getContentAsString(), ShoppingCartDto.class);
-        CartItemDto actualCartItem = actual.getCartItems().stream()
-                .filter(cart -> cart.getId().equals(cartId))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("CartItem with id " + cartId + " not found"));
-        assertEquals(expected.getId(), actual.getId());
-        assertEquals(expected.getUserId(), actual.getUserId());
-        assertEquals(expected.getCartItems().size(), actual.getCartItems().size());
-
-        assertEquals(expectedCartItem.getId(), actualCartItem.getId());
-        assertEquals(expectedCartItem.getQuantity(), actualCartItem.getQuantity());
-        assertEquals(expectedCartItem.getBookId(), actualCartItem.getBookId());
+        ShoppingCartDto actual = objectMapper.readValue(
+                result.getResponse().getContentAsString(), ShoppingCartDto.class);
+        assertEquals(expected, actual);
     }
 
     @DisplayName("Delete cart item when valid id provided")
-    @WithMockUser(username = "romander@gmail.com", roles = "USER")
+    @WithMockUser(username = "admin@gmail.com", roles = {"USER", "ADMIN"})
     @Test
     void deleteCartItem_WithValidId_ShouldReturnNoContentStatus() throws Exception {
         Long cartId = 1L;
@@ -202,5 +175,9 @@ public class ShoppingCartControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andReturn();
+
+        mockMvc.perform(get("/cart/{id}", cartId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

@@ -1,6 +1,9 @@
 package com.kozak.mybookshop.util;
 
 import com.kozak.mybookshop.dto.cartitem.CartItemDto;
+import com.kozak.mybookshop.dto.cartitem.CartItemQuantityRequestDto;
+import com.kozak.mybookshop.dto.cartitem.CreateCartItemRequestDto;
+import com.kozak.mybookshop.model.Book;
 import com.kozak.mybookshop.model.CartItem;
 
 public class CartItemDataTest {
@@ -18,5 +21,13 @@ public class CartItemDataTest {
                 .setQuantity(2)
                 .setBookId(1L)
                 .setBookTitle("New_man");
+    }
+
+    public static CartItemDto createSampleCartItemDto() {
+        return new CartItemDto()
+                .setId(4L)
+                .setQuantity(2)
+                .setBookId(3L)
+                .setBookTitle("Older_man_in_sea");
     }
 }

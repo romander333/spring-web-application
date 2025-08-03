@@ -10,7 +10,6 @@ import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.kozak.mybookshop.dto.book.BookDto;
 import com.kozak.mybookshop.dto.book.BookDtoWithoutCategoryIds;
@@ -48,6 +47,9 @@ public class BookServiceTest {
     @Mock
     private BookMapper bookMapper;
 
+    @Mock
+    private BookDataTest testUtil;
+
     @InjectMocks
     private BookServiceImpl bookService;
 
@@ -59,8 +61,8 @@ public class BookServiceTest {
 
         BookDto expected = sampleBookDto();
 
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-        when(bookMapper.toBookDto(book)).thenReturn(expected);
+        Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        Mockito.when(bookMapper.toBookDto(book)).thenReturn(expected);
 
         BookDto actual = bookService.getById(bookId);
 
@@ -74,7 +76,7 @@ public class BookServiceTest {
     @DisplayName("get book by invalid id and expected exception")
     void getById_WithInValidBookId_ShouldThrowEntityNotFoundException() {
         Long bookId = -100L;
-        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+        Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
         Exception exception = Assertions.assertThrows(EntityNotFoundException.class,
                 () -> bookService.getById(bookId)
@@ -101,9 +103,9 @@ public class BookServiceTest {
         BookDtoWithoutCategoryIds dto1 = sampleBookDtoWithoutCategoryIds();
         BookDtoWithoutCategoryIds dto2 = anotherSampleBookDtoWithoutCategoryIds();
 
-        when(bookMapper.toDtoWithoutCategories(book)).thenReturn(dto1);
-        when(bookMapper.toDtoWithoutCategories(book2)).thenReturn(dto2);
-        when(bookRepository.findByCategories_Id(categoryId))
+        Mockito.when(bookMapper.toDtoWithoutCategories(book)).thenReturn(dto1);
+        Mockito.when(bookMapper.toDtoWithoutCategories(book2)).thenReturn(dto2);
+        Mockito.when(bookRepository.findByCategories_Id(categoryId))
                 .thenReturn(List.of(book, book2));
         List<BookDtoWithoutCategoryIds> books = bookService.getBooksByCategoryId(categoryId);
 
@@ -121,9 +123,9 @@ public class BookServiceTest {
         BookDto bookDto = sampleBookDto();
         CreateBookRequestDto createBookRequestDto = sampleCreateBookRequestDto();
 
-        when(bookMapper.toBookDto(savedBook)).thenReturn(bookDto);
-        when(bookMapper.toModel(createBookRequestDto)).thenReturn(book);
-        when(bookRepository.save(book)).thenReturn(savedBook);
+        Mockito.when(bookMapper.toBookDto(savedBook)).thenReturn(bookDto);
+        Mockito.when(bookMapper.toModel(createBookRequestDto)).thenReturn(book);
+        Mockito.when(bookRepository.save(book)).thenReturn(savedBook);
 
         BookDto actual = bookService.save(createBookRequestDto);
         verify(bookRepository).save(book);
@@ -153,9 +155,9 @@ public class BookServiceTest {
 
         Page<Book> bookPage = new PageImpl<>(List.of(book, book2));
         Pageable pageable = PageRequest.of(0, 10);
-        when(bookMapper.toDtoWithoutCategories(book)).thenReturn(dto1);
-        when(bookMapper.toDtoWithoutCategories(book2)).thenReturn(dto2);
-        when(bookRepository.findAll(pageable)).thenReturn(bookPage);
+        Mockito.when(bookMapper.toDtoWithoutCategories(book)).thenReturn(dto1);
+        Mockito.when(bookMapper.toDtoWithoutCategories(book2)).thenReturn(dto2);
+        Mockito.when(bookRepository.findAll(pageable)).thenReturn(bookPage);
 
         Page<BookDtoWithoutCategoryIds> actual = bookService.findAll(pageable);
         assertEquals(2, actual.getContent().size());
@@ -170,7 +172,7 @@ public class BookServiceTest {
 
         CreateBookRequestDto createBookRequestDto = sampleCreateBookRequestDto();
 
-        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+        Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
         Exception exception = Assertions.assertThrows(EntityNotFoundException.class, () -> {
             bookService.update(createBookRequestDto,bookId);
         });

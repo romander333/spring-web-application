@@ -1,5 +1,6 @@
 package com.kozak.mybookshop.util;
 
+import com.kozak.mybookshop.model.Role;
 import com.kozak.mybookshop.model.User;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -8,51 +9,22 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+
+import static com.kozak.mybookshop.util.RoleDataTest.getRole;
 
 public class UserDataTest {
 
-    public static User sampleUser(Long userId) {
+    public static User sampleUser() {
+        Role role = getRole();
         User user = new User();
-        user.setId(userId);
+        user.setId(1L);
         user.setEmail("romander@gmail.com");
-        user.setFirstName("Roman");
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setPassword("$2a$12$k5M6AyJ4itLQTb6KgNZsCeTROTmcRGE0AUr9Z0Kk/Mr9aDM8LPkYq");
+        user.setShippingAddress("Some address");
+        user.setRoles(Set.of(role));
         return user;
-    }
-
-    public static Authentication sampleAuthentication(User user) {
-        return new Authentication() {
-            @Override
-            public Collection<? extends GrantedAuthority> getAuthorities() {
-                return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-            }
-
-            @Override
-            public Object getCredentials() {
-                return user.getPassword();
-            }
-
-            @Override
-            public Object getDetails() {
-                return null;
-            }
-
-            @Override
-            public Object getPrincipal() {
-                return user; // ← важливо, щоб твій об'єкт User повертався
-            }
-
-            @Override
-            public boolean isAuthenticated() {
-                return true;
-            }
-
-            @Override
-            public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {}
-
-            @Override
-            public String getName() {
-                return user.getEmail();
-            }
-        };
     }
 }

@@ -4,9 +4,12 @@ import com.kozak.mybookshop.dto.shoppingcart.ShoppingCartDto;
 import com.kozak.mybookshop.model.ShoppingCart;
 import com.kozak.mybookshop.model.User;
 
+import static com.kozak.mybookshop.util.UserDataTest.sampleUser;
+
 public class ShoppingCartDataTest {
 
-    public static ShoppingCart sampleShoppingCart(User user) {
+    public static ShoppingCart sampleShoppingCart() {
+        User user = sampleUser();
         ShoppingCart shoppingCart = new ShoppingCart();
         shoppingCart.setId(user.getId());
         shoppingCart.setUser(user);
