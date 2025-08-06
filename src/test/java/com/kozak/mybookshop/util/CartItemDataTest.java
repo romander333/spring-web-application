@@ -1,9 +1,6 @@
 package com.kozak.mybookshop.util;
 
 import com.kozak.mybookshop.dto.cartitem.CartItemDto;
-import com.kozak.mybookshop.dto.cartitem.CartItemQuantityRequestDto;
-import com.kozak.mybookshop.dto.cartitem.CreateCartItemRequestDto;
-import com.kozak.mybookshop.model.Book;
 import com.kozak.mybookshop.model.CartItem;
 
 public class CartItemDataTest {

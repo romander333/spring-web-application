@@ -1,10 +1,10 @@
 package com.kozak.mybookshop.util;
 
+import static com.kozak.mybookshop.util.UserDataTest.sampleUser;
+
 import com.kozak.mybookshop.dto.shoppingcart.ShoppingCartDto;
 import com.kozak.mybookshop.model.ShoppingCart;
 import com.kozak.mybookshop.model.User;
-
-import static com.kozak.mybookshop.util.UserDataTest.sampleUser;
 
 public class ShoppingCartDataTest {
 

@@ -37,7 +37,7 @@ public class AuthenticationService {
         }
 
         String email = authentication.getName();
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("User not found by email: " + email));
+        return userRepository.findByEmail(email).orElseThrow(()
+                -> new EntityNotFoundException("User not found by email: " + email));
     }
 }

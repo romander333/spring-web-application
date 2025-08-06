@@ -1,11 +1,8 @@
 package com.kozak.mybookshop.repository.shoppingcart;
 
 import static com.kozak.mybookshop.util.ShoppingCartDataTest.sampleShoppingCart;
-import static com.kozak.mybookshop.util.ShoppingCartDataTest.sampleShoppingCartDto;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-import com.kozak.mybookshop.dto.shoppingcart.ShoppingCartDto;
 import com.kozak.mybookshop.model.ShoppingCart;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;

@@ -1,17 +1,10 @@
 package com.kozak.mybookshop.util;
 
+import static com.kozak.mybookshop.util.RoleDataTest.getRole;
+
 import com.kozak.mybookshop.model.Role;
 import com.kozak.mybookshop.model.User;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
-
-import static com.kozak.mybookshop.util.RoleDataTest.getRole;
 
 public class UserDataTest {
 

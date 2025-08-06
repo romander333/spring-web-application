@@ -1,6 +1,5 @@
 package com.kozak.mybookshop.util;
 
-
 import com.kozak.mybookshop.model.Role;
 
 public class RoleDataTest {

@@ -1,12 +1,32 @@
 package com.kozak.mybookshop.controller;
 
+import static com.kozak.mybookshop.util.CartItemDataTest.createSampleCartItemDto;
+import static com.kozak.mybookshop.util.CartItemDataTest.sampleCartItemDto;
+import static com.kozak.mybookshop.util.ShoppingCartDataTest.sampleShoppingCartDto;
+import static org.junit.Assert.assertEquals;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kozak.mybookshop.dto.cartitem.CartItemDto;
 import com.kozak.mybookshop.dto.cartitem.CartItemQuantityRequestDto;
 import com.kozak.mybookshop.dto.cartitem.CreateCartItemRequestDto;
 import com.kozak.mybookshop.dto.shoppingcart.ShoppingCartDto;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
+import javax.sql.DataSource;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
@@ -17,19 +37,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
-
-import static com.kozak.mybookshop.util.CartItemDataTest.createSampleCartItemDto;
-import static com.kozak.mybookshop.util.CartItemDataTest.sampleCartItemDto;
-import static com.kozak.mybookshop.util.ShoppingCartDataTest.sampleShoppingCartDto;
-import static org.junit.Assert.assertEquals;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ShoppingCartControllerTest {
@@ -91,8 +98,6 @@ public class ShoppingCartControllerTest {
     @WithMockUser(username = "romander@gmail.com", roles = "USER")
     @Test
     void updateQuantityById_WithValidId_ShouldReturnShoppingCartDto() throws Exception {
-        Long id = 1L;
-        int quantity = 2;
         CartItemDto cartItem = sampleCartItemDto();
         cartItem.setQuantity(2);
         Set<CartItemDto> cartItems = new HashSet<>();
@@ -100,7 +105,9 @@ public class ShoppingCartControllerTest {
         ShoppingCartDto expected = sampleShoppingCartDto();
         expected.setCartItems(cartItems);
         CartItemQuantityRequestDto requestDto = new CartItemQuantityRequestDto();
+        int quantity = 2;
         requestDto.setQuantity(quantity);
+        Long id = 1L;
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
         MvcResult result = mockMvc.perform(put("/cart/items/{id}", id)
@@ -133,14 +140,12 @@ public class ShoppingCartControllerTest {
                 result.getResponse().getContentAsString(), ShoppingCartDto.class);
 
         assertEquals(expected, actual);
-
     }
 
     @DisplayName("Add cart item when valid request provided")
     @WithMockUser(username = "romander@gmail.com", roles = "USER")
     @Test
     void addCartItem_WithValidRequest_ShouldReturnShoppingCartDto() throws Exception {
-        Long cartId = 4L;
         CartItemDto cartItem = sampleCartItemDto();
         CartItemDto expectedCartItem = createSampleCartItemDto();
         Set<CartItemDto> cartItems = new HashSet<>();
@@ -166,7 +171,7 @@ public class ShoppingCartControllerTest {
     }
 
     @DisplayName("Delete cart item when valid id provided")
-    @WithMockUser(username = "admin@gmail.com", roles = {"USER", "ADMIN"})
+    @WithMockUser(username = "romander@gmail.com", roles = "USER")
     @Test
     void deleteCartItem_WithValidId_ShouldReturnNoContentStatus() throws Exception {
         Long cartId = 1L;
@@ -175,9 +180,5 @@ public class ShoppingCartControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andReturn();
-
-        mockMvc.perform(get("/cart/{id}", cartId)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
     }
 }

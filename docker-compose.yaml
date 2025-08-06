@@ -1,10 +1,20 @@
-version: "3.8"
-
 services:
   mysqldb:
     image: mysql:8.0
     restart: always
     env_file: .env
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQLDB_USER}
+      MYSQL_PASSWORD: ${MYSQLDB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQLDB_ROOT_PASSWORD}
+    ports:
+      - "${MYSQLDB_LOCAL_PORT}:${MYSQLDB_DOCKER_PORT}"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${MYSQLDB_USER}", "-p${MYSQLDB_PASSWORD}", "--silent" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 
   app:
@@ -19,11 +29,12 @@ services:
       - "${SPRING_LOCAL_PORT}:${SPRING_DOCKER_PORT}"
       - "${DEBUG_PORT}:${DEBUG_PORT}"
     environment:
-      SPRING_APPLICATION_JSON: >
+      SPRING_APPLICATION_JSON: |
         {
           "spring.datasource.url": "jdbc:mysql://mysqldb:${MYSQLDB_DOCKER_PORT}/${MYSQLDB_DATABASE}?createDatabaseIfNotExist=true",
           "spring.datasource.username": "${MYSQLDB_USER}",
           "spring.datasource.password": "${MYSQLDB_PASSWORD}",
-          "spring.jpa.hibernate.ddl-auto": "validate"
+          "spring.jpa.hibernate.ddl-auto": "update",
+          "jwt.secret": "${JWT_SECRET}"
         }
-        JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${DEBUG_PORT}"
+      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${DEBUG_PORT}"
