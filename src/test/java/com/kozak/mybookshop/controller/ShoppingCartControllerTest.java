@@ -3,6 +3,7 @@ package com.kozak.mybookshop.controller;
 import static com.kozak.mybookshop.util.CartItemDataTest.createSampleCartItemDto;
 import static com.kozak.mybookshop.util.CartItemDataTest.sampleCartItemDto;
 import static com.kozak.mybookshop.util.ShoppingCartDataTest.sampleShoppingCartDto;
+import static com.kozak.mybookshop.util.UserDataTest.sampleUser;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -16,6 +17,7 @@ import com.kozak.mybookshop.dto.cartitem.CartItemDto;
 import com.kozak.mybookshop.dto.cartitem.CartItemQuantityRequestDto;
 import com.kozak.mybookshop.dto.cartitem.CreateCartItemRequestDto;
 import com.kozak.mybookshop.dto.shoppingcart.ShoppingCartDto;
+import com.kozak.mybookshop.model.User;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -32,7 +34,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -40,8 +44,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ShoppingCartControllerTest {
-
-    @Autowired
     protected static MockMvc mockMvc;
 
     @Autowired
@@ -72,6 +74,15 @@ public class ShoppingCartControllerTest {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        User testUser = sampleUser();
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                testUser,
+                null,
+                testUser.getAuthorities()
+        );
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     @AfterEach
@@ -95,7 +106,6 @@ public class ShoppingCartControllerTest {
     }
 
     @DisplayName("Update quantity book when valid id provided")
-    @WithMockUser(username = "romander@gmail.com", roles = "USER")
     @Test
     void updateQuantityById_WithValidId_ShouldReturnShoppingCartDto() throws Exception {
         CartItemDto cartItem = sampleCartItemDto();
@@ -122,7 +132,6 @@ public class ShoppingCartControllerTest {
     }
 
     @DisplayName("Get shopping cart in current user")
-    @WithMockUser(username = "romander@gmail.com", roles = "USER")
     @Test
     void getShoppingCart_WithGivenShoppingCart_ShouldReturnShoppingCartDto() throws Exception {
         CartItemDto cartItem = sampleCartItemDto();
@@ -143,7 +152,6 @@ public class ShoppingCartControllerTest {
     }
 
     @DisplayName("Add cart item when valid request provided")
-    @WithMockUser(username = "romander@gmail.com", roles = "USER")
     @Test
     void addCartItem_WithValidRequest_ShouldReturnShoppingCartDto() throws Exception {
         CartItemDto cartItem = sampleCartItemDto();
@@ -171,7 +179,6 @@ public class ShoppingCartControllerTest {
     }
 
     @DisplayName("Delete cart item when valid id provided")
-    @WithMockUser(username = "romander@gmail.com", roles = "USER")
     @Test
     void deleteCartItem_WithValidId_ShouldReturnNoContentStatus() throws Exception {
         Long cartId = 1L;

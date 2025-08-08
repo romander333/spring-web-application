@@ -6,18 +6,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode
 @SQLDelete(sql = "UPDATE categories SET is_deleted = true where id=?")
 @SQLRestriction("is_deleted = false")
 @Table(name = "categories")

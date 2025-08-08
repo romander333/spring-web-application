@@ -8,6 +8,7 @@ import static com.kozak.mybookshop.util.ShoppingCartDataTest.sampleShoppingCartD
 import static com.kozak.mybookshop.util.UserDataTest.sampleUser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.verify;
 
 import com.kozak.mybookshop.dto.cartitem.CartItemDto;
 import com.kozak.mybookshop.dto.cartitem.CartItemQuantityRequestDto;
@@ -89,6 +90,7 @@ public class ShoppingCartServiceTest {
         ShoppingCartDto actual = shoppingCartService.updateQuantityById(id, requestDto);
 
         assertEquals(expected, actual);
+        verify(shoppingCartRepository).save(Mockito.any(ShoppingCart.class));
     }
 
     @Test
@@ -110,6 +112,7 @@ public class ShoppingCartServiceTest {
         String actual = exception.getMessage();
 
         assertEquals("CartItem not found by id: " + id, actual);
+        verify(shoppingCartRepository).findShoppingCartByUser_Id(1L);
     }
 
     @Test
@@ -131,6 +134,7 @@ public class ShoppingCartServiceTest {
 
         ShoppingCartDto actual = shoppingCartService.createShoppingCart(user);
         assertEquals(expected, actual);
+        verify(shoppingCartRepository).save(Mockito.any(ShoppingCart.class));
 
     }
 
@@ -170,6 +174,7 @@ public class ShoppingCartServiceTest {
 
         shoppingCartService.deleteCartItem(id);
         assertTrue(shoppingCart.getCartItems().isEmpty());
+        verify(shoppingCartRepository).findShoppingCartByUser_Id(id);
     }
 
     @Test
@@ -206,6 +211,8 @@ public class ShoppingCartServiceTest {
         ShoppingCartDto actual = shoppingCartService.addCartItem(requestDto);
 
         assertEquals(expected, actual);
+        verify(shoppingCartRepository).save(Mockito.any(ShoppingCart.class));
+        verify(shoppingCartRepository).findShoppingCartByUser_Id(id);
     }
 
     @Test
@@ -225,5 +232,6 @@ public class ShoppingCartServiceTest {
         ShoppingCartDto actual = shoppingCartService.getShoppingCart();
 
         assertEquals(expected, actual);
+        verify(shoppingCartRepository).findShoppingCartByUser_Id(id);
     }
 }

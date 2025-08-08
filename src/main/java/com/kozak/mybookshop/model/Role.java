@@ -11,14 +11,12 @@ import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 
 @Entity
 @Getter
 @Setter
 @EqualsAndHashCode
-@ToString
 @Table(name = "roles")
 public class Role implements GrantedAuthority {
     @Id

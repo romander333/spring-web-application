@@ -1,13 +1,32 @@
 package com.kozak.mybookshop.controller;
 
+import static com.kozak.mybookshop.util.BookDataTest.sampleBookDtoWithoutCategoryIdsList;
+import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryRequestDto;
+import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryResponseDto;
+import static org.junit.Assert.assertEquals;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kozak.mybookshop.dto.book.BookDtoWithoutCategoryIds;
 import com.kozak.mybookshop.dto.category.CategoryRequestDto;
 import com.kozak.mybookshop.dto.category.CategoryResponseDto;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+import javax.sql.DataSource;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
@@ -19,24 +38,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-
-import static com.kozak.mybookshop.util.BookDataTest.sampleBookDtoWithoutCategoryIdsList;
-import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryRequestDto;
-import static com.kozak.mybookshop.util.CategoryDataTest.sampleCategoryResponseDto;
-import static org.junit.Assert.assertEquals;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CategoryControllerTest {
     protected static MockMvc mockMvc;
-    private static final String COVER_IMAGE =
-            "https://i.pinimg.com/originals/9f/a8/9e/9fa89e944234f7c3fe04bacc6da638b2.png";
 
     @Autowired
     private ObjectMapper objectMapper;

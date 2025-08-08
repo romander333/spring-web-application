@@ -4,7 +4,6 @@ import com.kozak.mybookshop.dto.book.BookDto;
 import com.kozak.mybookshop.dto.book.BookDtoWithoutCategoryIds;
 import com.kozak.mybookshop.dto.book.CreateBookRequestDto;
 import com.kozak.mybookshop.model.Book;
-
 import java.math.BigDecimal;
 import java.util.List;
 
