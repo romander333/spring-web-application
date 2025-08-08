@@ -35,18 +35,27 @@ databaseChangeLog:
                   constraints:
                     nullable: false
 
-              - addForeignKeyConstraint:
-                  baseTableName: cart_items
-                  baseColumnNames: cart_id
-                  constraintName: fk_cart_items_cart
-                  referencedTableName: shopping_сarts
-                  referencedColumnNames: id
-                  onDelete: CASCADE
-                    
-              - addForeignKeyConstraint:
-                  baseTableName: cart_items
-                  baseColumnNames: book_id
-                  constraintName: fk_cart_items_book
-                  referencedTableName: books
-                  referencedColumnNames: id
-                  onDelete: CASCADE
+  - changeSet:
+      id: add-fk-cart-items-cart
+      author: roman
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: cart_items
+            baseColumnNames: cart_id
+            constraintName: fk_cart_items_cart
+            referencedTableName: shopping_carts
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+  - changeSet:
+      id: add-fk-cart-items-book
+      author: roman
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: cart_items
+            baseColumnNames: book_id
+            constraintName: fk_cart_items_book
+            referencedTableName: books
+            referencedColumnNames: id
+            onDelete: CASCADE
+

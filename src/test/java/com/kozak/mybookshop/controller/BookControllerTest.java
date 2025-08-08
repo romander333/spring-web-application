@@ -41,8 +41,6 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class BookControllerTest {
     protected static MockMvc mockMvc;
-    private static final String COVER_IMAGE =
-            "https://i.pinimg.com/originals/9f/a8/9e/9fa89e944234f7c3fe04bacc6da638b2.png";
 
     @Autowired
     private ObjectMapper objectMapper;

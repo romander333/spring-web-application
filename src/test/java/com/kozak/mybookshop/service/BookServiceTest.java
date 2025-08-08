@@ -155,6 +155,7 @@ public class BookServiceTest {
         assertEquals(2, actual.getContent().size());
         assertEquals(expected1, actual.getContent().get(0));
         assertEquals(expected2, actual.getContent().get(1));
+        verify(bookRepository).findAll(pageable);
     }
 
     @Test
@@ -171,5 +172,6 @@ public class BookServiceTest {
         String actual = exception.getMessage();
 
         assertEquals("Book not found by id:" + bookId, actual);
+        verify(bookRepository).findById(bookId);
     }
 }
