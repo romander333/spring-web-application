@@ -20,11 +20,13 @@ import com.kozak.mybookshop.model.Book;
 import com.kozak.mybookshop.model.Category;
 import com.kozak.mybookshop.repository.book.BookRepository;
 import com.kozak.mybookshop.service.book.BookServiceImpl;
-import com.kozak.mybookshop.util.BookDataTest;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import com.kozak.mybookshop.util.BookDataTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

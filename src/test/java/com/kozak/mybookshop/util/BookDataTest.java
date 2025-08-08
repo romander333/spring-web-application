@@ -4,7 +4,9 @@ import com.kozak.mybookshop.dto.book.BookDto;
 import com.kozak.mybookshop.dto.book.BookDtoWithoutCategoryIds;
 import com.kozak.mybookshop.dto.book.CreateBookRequestDto;
 import com.kozak.mybookshop.model.Book;
+
 import java.math.BigDecimal;
+import java.util.List;
 
 public class BookDataTest {
     private static final String COVER_IMAGE =
@@ -32,17 +34,6 @@ public class BookDataTest {
         return book;
     }
 
-    public static Book getThirdSampleBook() {
-        Book book = new Book();
-        book.setId(3L);
-        book.setTitle("Older_man_in_sea");
-        book.setAuthor("Katerina");
-        book.setIsbn("3313");
-        book.setPrice(BigDecimal.valueOf(300));
-        book.setCoverImage(COVER_IMAGE);
-        return book;
-    }
-
     public static BookDto sampleBookDto() {
         return new BookDto()
                 .setId(1L)
@@ -50,6 +41,36 @@ public class BookDataTest {
                 .setAuthor("Roman")
                 .setIsbn("333")
                 .setPrice(BigDecimal.valueOf(95.99))
+                .setCoverImage(COVER_IMAGE)
+                .setCategoryIds(List.of());
+    }
+
+    public static BookDto sampleBookDtoForUpdateOrCreate() {
+        return new BookDto()
+                .setId(4L)
+                .setTitle("Black_man")
+                .setAuthor("Kozak")
+                .setIsbn("4555")
+                .setPrice(BigDecimal.TEN)
+                .setCoverImage(COVER_IMAGE)
+                .setCategoryIds(List.of(1L));
+    }
+
+    public static BookDtoWithoutCategoryIds sampleBookDtoWithoutCategoryIds() {
+        return new BookDtoWithoutCategoryIds()
+                .setAuthor("Roman")
+                .setTitle("New_man")
+                .setIsbn("333")
+                .setPrice(BigDecimal.valueOf(99.99))
+                .setCoverImage(COVER_IMAGE);
+    }
+
+    public static BookDtoWithoutCategoryIds anotherSampleBookDtoWithoutCategoryIds() {
+        return new BookDtoWithoutCategoryIds()
+                .setAuthor("Madyara")
+                .setTitle("Bad_Book")
+                .setIsbn("123321")
+                .setPrice(BigDecimal.valueOf(250))
                 .setCoverImage(COVER_IMAGE);
     }
 
@@ -62,21 +83,57 @@ public class BookDataTest {
                 .setCoverImage(COVER_IMAGE);
     }
 
-    public static BookDtoWithoutCategoryIds sampleBookDtoWithoutCategoryIds() {
-        return new BookDtoWithoutCategoryIds()
+    public static CreateBookRequestDto sampleCreateBookRequestDtoForCreateBookOrUpdate() {
+        return new CreateBookRequestDto()
+                .setTitle("Black_man")
                 .setAuthor("Kozak")
-                .setTitle("Good_Book")
-                .setIsbn("123456789")
-                .setPrice(BigDecimal.valueOf(99.99))
-                .setCoverImage(COVER_IMAGE);
+                .setIsbn("4555")
+                .setPrice(BigDecimal.TEN)
+                .setCoverImage(COVER_IMAGE)
+                .setCategoryIds(List.of(1L));
     }
 
-    public static BookDtoWithoutCategoryIds anotherSampleBookDtoWithoutCategoryIds() {
-        return new BookDtoWithoutCategoryIds()
-                .setAuthor("Madyara")
-                .setTitle("Bad_Book")
-                .setIsbn("123321")
-                .setPrice(BigDecimal.valueOf(250))
-                .setCoverImage(COVER_IMAGE);
+    public static List<BookDto> sampleBookDtoList() {
+        return List.of(
+                new BookDto()
+                        .setId(1L)
+                        .setTitle("New_man")
+                        .setAuthor("Roman")
+                        .setIsbn("333")
+                        .setPrice(BigDecimal.valueOf(95.99))
+                        .setCoverImage(COVER_IMAGE),
+                new BookDto()
+                        .setId(2L)
+                        .setTitle("Super_man")
+                        .setAuthor("Andrew")
+                        .setIsbn("3323")
+                        .setPrice(BigDecimal.valueOf(150.0))
+                        .setCoverImage(COVER_IMAGE),
+                new BookDto()
+                        .setId(3L)
+                        .setTitle("Older_man_in_sea")
+                        .setAuthor("Katerina")
+                        .setIsbn("3313")
+                        .setPrice(BigDecimal.valueOf(300.0))
+                        .setCoverImage(COVER_IMAGE));
+    }
+
+    public static List<BookDtoWithoutCategoryIds> sampleBookDtoWithoutCategoryIdsList() {
+        return List.of(
+                new BookDtoWithoutCategoryIds()
+                        .setId(2L)
+                        .setTitle("Super_man")
+                        .setAuthor("Andrew")
+                        .setIsbn("3323")
+                        .setPrice(BigDecimal.valueOf(150).setScale(2, BigDecimal.ROUND_HALF_UP))
+                        .setCoverImage(COVER_IMAGE),
+                new BookDtoWithoutCategoryIds()
+                        .setId(3L)
+                        .setTitle("Older_man_in_sea")
+                        .setAuthor("Katerina")
+                        .setIsbn("3313")
+                        .setPrice(BigDecimal.valueOf(300).setScale(2, BigDecimal.ROUND_HALF_UP))
+                        .setCoverImage(COVER_IMAGE)
+        );
     }
 }
